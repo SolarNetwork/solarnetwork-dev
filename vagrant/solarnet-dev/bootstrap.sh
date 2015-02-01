@@ -2,7 +2,7 @@
 
 sudo apt-get update
 sudo apt-get install -y xorg fluxbox
-sudo apt-get install -y postgresql-9.3-plv8 git git-flow openjdk-7-jdk librxtx-java
+sudo apt-get install -y postgresql-9.3-plv8 pgadmin3 git git-flow openjdk-7-jdk librxtx-java
 sudo apt-get install -y firefox
 
 if [ -e /usr/share/java/RXTXcomm.jar -a -d /usr/lib/jvm/java-7-openjdk-i386/jre/lib/ext \
@@ -61,7 +61,7 @@ if [ $? -ne 0 ]; then
 	echo 'Creating SolarNetwork Postgres database...'
 	sudo -u postgres createuser -AD solarnet
 	sudo -u postgres psql -U postgres -d postgres -c "alter user solarnet with password 'solarnet';"
-	sudo -u postgres createdb -E UNICODE -O solarnet solarnetwork
+	sudo -u postgres createdb -E UNICODE -l C -T template0 -O solarnet solarnetwork
 	sudo -u postgres createlang plv8 solarnetwork
 fi
 
@@ -70,7 +70,7 @@ if [ $? -ne 0 ]; then
 	echo 'Creating SolarNetwork unit test Postgres database...'
 	sudo -u postgres createuser -AD solarnet_test
 	sudo -u postgres psql -U postgres -d postgres -c "alter user solarnet_test with password 'solarnet_test';"
-	sudo -u postgres createdb -E UNICODE -O solarnet_test solarnet_unittest
+	sudo -u postgres createdb -E UNICODE -l C -T template0 -O solarnet_test solarnet_unittest
 	sudo -u postgres createlang plv8 solarnet_unittest
 fi
 
