@@ -3,6 +3,7 @@
 sudo apt-get update
 sudo apt-get install -y xorg fluxbox
 sudo apt-get install -y postgresql-9.3-plv8 git git-flow openjdk-7-jdk librxtx-java
+sudo apt-get install -y firefox
 
 if [ -e /usr/share/java/RXTXcomm.jar -a -d /usr/lib/jvm/java-7-openjdk-i386/jre/lib/ext \
 		-a ! -e /usr/lib/jvm/java-7-openjdk-i386/jre/lib/ext/RXTXcomm.jar ]; then
