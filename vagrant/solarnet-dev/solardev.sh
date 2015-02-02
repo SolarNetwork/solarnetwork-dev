@@ -90,10 +90,11 @@ fi
 
 if [ ! -d ~/git/solarnetwork-build/solarnetwork-osgi-target/conf/tls ]; then
 	echo 'Creating conf/tls directory...'
-	mkdir ~/git/solarnetwork-build/solarnetwork-osgi-target/conf/tls
-	cd ~/git/solarnetwork-build/solarnetwork-osgi-target/conf/tls
-	ln -s ../../var/DeveloperCA/central.jks
-	ln -s ../../var/DeveloperCA/central-trust.jks
+	mkdir -p ~/git/solarnetwork-build/solarnetwork-osgi-target/conf/tls
+	if cd ~/git/solarnetwork-build/solarnetwork-osgi-target/conf/tls; then
+		ln -s ../../var/DeveloperCA/central.jks
+		ln -s ../../var/DeveloperCA/central-trust.jks
+	fi
 fi
 
 if [ ! -e ~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/log4j.properties ]; then
