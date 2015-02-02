@@ -127,6 +127,12 @@ if [ ! -e ~/git/solarnetwork-central/net.solarnetwork.central.test/environment/l
 		~/git/solarnetwork-central/net.solarnetwork.central.test/environment/local/
 fi
 
+if [ ! -e ~/git/solarnetwork-central/net.solarnetwork.central.user.web/web/WEB-INF/packtag.user.properties ]; then
+	echo 'Creating SolarUser pack:tag configuration...'
+	cp ~/git/solarnetwork-central/net.solarnetwork.central.user.web/example/web/WEB-INF/packtag.user.properties \
+		~/git/solarnetwork-central/net.solarnetwork.central.user.web/web/WEB-INF/packtag.user.properties
+fi
+
 if [ ! -e ~/git/solarnetwork-node/net.solarnetwork.node.test/environment/local/log4j.properties ]; then
 	echo 'Creating SolarNode unit test configuration...'
 	cp ~/git/solarnetwork-node/net.solarnetwork.node.test/environment/example/* \
