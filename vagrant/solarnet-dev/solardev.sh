@@ -18,6 +18,18 @@ fi
 EOF
 fi
 
+# Setup Eclipse
+# Checkout SolarNetwork sources
+for proj in build external common central node; do
+	if [ ! -d ~/git/solarnetwork-$proj ]; then
+		echo "Cloning project solarnetwork-$proj..."
+		mkdir -p ~/git/solarnetwork-$proj
+		git clone "https://github.com/SolarNetwork/solarnetwork-$proj.git" ~/git/solarnetwork-$proj
+		cd ~/git/solarnetwork-$proj
+		git checkout -b develop origin/develop
+	fi
+done
+
 # Setup main SolarNet database
 psql -d solarnetwork -U solarnet -c 'select count(*) from solarnet.sn_node' >/dev/null 2>&1
 if [ $? -ne 0 ]; then
@@ -37,18 +49,6 @@ if [ $? -ne 0 ]; then
 	sed -e '/^\/\*/d' -e '/^ \*/d' postgres-init-plv8.sql |psql -d solarnet_unittest -U solarnet_test
 	psql -d solarnet_unittest -U solarnet_test -f postgres-init.sql
 fi
-
-# Setup Eclipse
-# Checkout SolarNetwork sources
-for proj in build external common central node; do
-	if [ ! -d ~/git/solarnetwork-$proj ]; then
-		echo "Cloning project solarnetwork-$proj..."
-		mkdir -p ~/git/solarnetwork-$proj
-		git clone "https://github.com/SolarNetwork/solarnetwork-$proj.git" ~/git/solarnetwork-$proj
-		cd ~/git/solarnetwork-$proj
-		git checkout -b develop origin/develop
-	fi
-done
 
 cd ~
 
