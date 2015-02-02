@@ -133,6 +133,12 @@ if [ ! -e ~/git/solarnetwork-node/net.solarnetwork.node.test/environment/local/l
 		~/git/solarnetwork-node/net.solarnetwork.node.test/environment/local/
 fi
 
+if [ ! -e ~/git/solarnetwork-node/net.solarnetwork.node.setup.web/web/WEB-INF/packtag.user.properties ]; then
+	echo 'Creating SolarNode pack:tag configuration...'
+	cp ~/git/solarnetwork-node/net.solarnetwork.node.setup.web/example/web/WEB-INF/packtag.user.properties \
+		~/git/solarnetwork-node/net.solarnetwork.node.setup.web/web/WEB-INF/packtag.user.properties
+fi
+
 eclipseDownload=/var/tmp/eclipse.tgz
 eclipseDownloadMD5=7385aaff4872800153ebc90d8c92e707
 eclipseDownloadHash=
