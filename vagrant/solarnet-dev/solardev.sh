@@ -201,13 +201,9 @@ elementIn () {
 }
 
 addTeamProviderRepo () {
-	local repo
-	local proj
-	repo=`echo $1 |cut -d'/' -f1`
-	proj=`echo $1 |cut -d'/' -f2`
 	echo "Adding $project to Eclipse Team Project Set..."
 	cat >> $2 <<EOF
-<project reference="1.0,https://github.com/SolarNetwork/${repo}.git,develop,${proj}"/>
+<project reference="1.0,https://github.com/SolarNetwork/${1%%/*}.git,develop,${1##*/}"/>
 EOF
 }
 
