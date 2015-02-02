@@ -98,7 +98,7 @@ fi
 
 if [ ! -e ~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/log4j.properties ]; then
 	echo 'Creating platform logging configuration...'
-	cp ~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/example/log4j.properties \
+	cp ~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/example/log4j-dev.properties \
 		~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/log4j.properties
 fi
 
