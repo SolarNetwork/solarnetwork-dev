@@ -192,10 +192,12 @@ EOF
 
 skipProjects=("solarnetwork-build/archiva-obr-plugin" \
 	"solarnetwork-build/net.solarnetwork.pki.sun.security" \
+	"solarnetwork-central/net.solarnetwork.central.common.mail.javamail" \
 	"solarnetwork-central/net.solarnetwork.central.user.pki.dogtag" \
 	"solarnetwork-central/net.solarnetwork.central.user.pki.dogtag.test" \
 	"solarnetwork-node/net.solarnetwork.node.config" \
-	"solarnetwork-node/net.solarnetwork.node.setup.developer" )
+	"solarnetwork-node/net.solarnetwork.node.setup.developer" \
+	"solarnetwork-node/net.solarnetwork.node.upload.mock" )
 # Generate Eclipse Team Project Set of all projects to import
 if [ ! -e ~/SolarNetworkTeamProjectSet.psf ]; then
 	cat > ~/SolarNetworkTeamProjectSet.psf <<EOF
