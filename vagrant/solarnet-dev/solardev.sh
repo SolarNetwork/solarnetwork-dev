@@ -88,6 +88,14 @@ if [ ! -e ~/git/solarnetwork-build/solarnetwork-osgi-target/configurations/servi
 EOF
 fi
 
+if [ ! -d ~/git/solarnetwork-build/solarnetwork-osgi-target/conf/tls ]; then
+	echo 'Creating conf/tls directory...'
+	mkdir ~/git/solarnetwork-build/solarnetwork-osgi-target/conf/tls
+	cd ~/git/solarnetwork-build/solarnetwork-osgi-target/conf/tls
+	ln -s ../../var/DeveloperCA/central.jks
+	ln -s ../../var/DeveloperCA/central-trust.jks
+fi
+
 if [ ! -e ~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/log4j.properties ]; then
 	echo 'Creating platform logging configuration...'
 	cp ~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/example/log4j.properties \
