@@ -100,6 +100,12 @@ if [ ! -e ~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/l
 		~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/log4j.properties
 fi
 
+if [ ! -e ~/git/solarnetwork-external/org.eclipse.gemini.blueprint.extender.config/META-INF/spring/extender/solarnetwork-context.xml ]; then
+	echo 'Creating Gemini Extender configuration...'
+	cp ~/git/solarnetwork-external/org.eclipse.gemini.blueprint.extender.config/example/META-INF/spring/extender/solarnetwork-context.xml \
+		~/git/solarnetwork-external/org.eclipse.gemini.blueprint.extender.config/META-INF/spring/extender/
+fi
+
 if [ ! -e ~/git/solarnetwork-common/net.solarnetwork.common.test/environment/local/log4j.properties ]; then
 	echo 'Creating common unit test configuration...'
 	cp ~/git/solarnetwork-common/net.solarnetwork.common.test/environment/example/* \
