@@ -2,7 +2,7 @@
 
 sudo apt-get update
 sudo apt-get install -y xorg fluxbox
-sudo apt-get install -y postgresql-9.3-plv8 pgadmin3 git git-flow openjdk-7-jdk librxtx-java
+sudo apt-get install -y postgresql-9.3-plv8 postgresql-contrib-9.3 pgadmin3 git git-flow openjdk-7-jdk librxtx-java
 sudo apt-get install -y firefox libwebkitgtk-1.0-0
 
 if [ -e /usr/share/java/RXTXcomm.jar -a -d /usr/lib/jvm/java-7-openjdk-i386/jre/lib/ext \
@@ -63,6 +63,7 @@ if [ $? -ne 0 ]; then
 	sudo -u postgres psql -U postgres -d postgres -c "alter user solarnet with password 'solarnet';"
 	sudo -u postgres createdb -E UNICODE -l C -T template0 -O solarnet solarnetwork
 	sudo -u postgres createlang plv8 solarnetwork
+	sudo -u postgres psql -U postgres -d solarnetwork -c "CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public;"
 fi
 
 sudo -u postgres sh -c "psql -d solarnet_unittest -c 'SELECT now()'" >/dev/null 2>&1
@@ -72,6 +73,7 @@ if [ $? -ne 0 ]; then
 	sudo -u postgres psql -U postgres -d postgres -c "alter user solarnet_test with password 'solarnet_test';"
 	sudo -u postgres createdb -E UNICODE -l C -T template0 -O solarnet_test solarnet_unittest
 	sudo -u postgres createlang plv8 solarnet_unittest
+	sudo -u postgres psql -U postgres -d solarnet_unittest -c "CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public;"
 fi
 
 if [ -x /vagrant/solardev.sh ]; then
