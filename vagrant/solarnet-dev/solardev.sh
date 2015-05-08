@@ -146,15 +146,14 @@ if [ ! -e ~/git/solarnetwork-node/net.solarnetwork.node.setup.web/web/WEB-INF/pa
 fi
 
 eclipseDownload=/var/tmp/eclipse.tgz
-eclipseDownloadMD5=7385aaff4872800153ebc90d8c92e707
+eclipseDownloadMD5=d8e1b995e95dbec95d69d62ddf6f94f6
 eclipseDownloadHash=
 if [ -e "$eclipseDownload" ]; then
 	eclipseDownloadHash=`md5sum $eclipseDownload |cut -d' ' -f1`
 fi
 if [ "$eclipseDownloadHash" != "$eclipseDownloadMD5" ]; then
 	echo 'Downloading Eclipse Luna...'
-	#wget -c -O $eclipseDownload -nv http://mirrors.ibiblio.org/eclipse/technology/epp/downloads/release/luna/SR1a/eclipse-jee-luna-SR1a-linux-gtk.tar.gz
-	curl -C - -s -S -o $eclipseDownload http://mirrors.ibiblio.org/eclipse/technology/epp/downloads/release/luna/SR1a/eclipse-jee-luna-SR1a-linux-gtk.tar.gz
+	curl -C - -s -S -o $eclipseDownload http://mirrors.ibiblio.org/eclipse/technology/epp/downloads/release/luna/SR2/eclipse-jee-luna-SR2-linux-gtk.tar.gz
 fi
 if [ -e "$eclipseDownload" ]; then
 	eclipseDownloadHash=`md5sum $eclipseDownload |cut -d' ' -f1`
