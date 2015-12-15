@@ -56,7 +56,7 @@ cd ~
 if [ ! -d ~/git/solarnetwork-build/solarnetwork-osgi-target/config ]; then
 	echo 'Creating solarnetwork-build/solarnetwork-osgi-target/config files...'
 	cp -a ~/git/solarnetwork-build/solarnetwork-osgi-target/example/config ~/git/solarnetwork-build/solarnetwork-osgi-target/
-	
+
 	# Enable the SolarIn SSL connector in tomcat-server.xml
 	sed -e '9s/$/-->/' -e '16d' ~/git/solarnetwork-build/solarnetwork-osgi-target/example/config/tomcat-server.xml \
 		> ~/git/solarnetwork-build/solarnetwork-osgi-target/config/tomcat-server.xml
@@ -227,7 +227,7 @@ if [ ! -e ~/SolarNetworkTeamProjectSet.psf ]; then
 <psf version="2.0">
 <provider id="org.eclipse.egit.core.GitProvider">
 EOF
-	
+
 	cd ~/git
 	projects=`ls -1d */*`
 	for project in $projects; do
@@ -237,7 +237,7 @@ EOF
 			addTeamProviderRepo "$project" ~/SolarNetworkTeamProjectSet.psf
 		fi
 	done
-	
+
 	cat >> ~/SolarNetworkTeamProjectSet.psf <<EOF
 </provider>
 </psf>
@@ -308,5 +308,5 @@ cat <<EOF
 
 SolarNetwork development environment setup complete. Log into the VM as
 solardev:solardev and Eclipse will launch automatically. Right-click on
-the desktop to access a menu of other options. 
+the desktop to access a menu of other options.
 EOF
