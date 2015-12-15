@@ -152,15 +152,15 @@ if [ -e "$eclipseDownload" ]; then
 	eclipseDownloadHash=`md5sum $eclipseDownload |cut -d' ' -f1`
 fi
 if [ "$eclipseDownloadHash" != "$eclipseDownloadMD5" ]; then
-	echo 'Downloading Eclipse Luna...'
-	curl -C - -s -S -o $eclipseDownload http://mirrors.ibiblio.org/eclipse/technology/epp/downloads/release/luna/SR2/eclipse-jee-luna-SR2-linux-gtk.tar.gz
+	echo 'Downloading Eclipse JEE...'
+	curl -C - -L -s -S -o $eclipseDownload 'http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/luna/SR2/eclipse-jee-luna-SR2-linux-gtk.tar.gz&r=1'
 fi
 if [ -e "$eclipseDownload" ]; then
 	eclipseDownloadHash=`md5sum $eclipseDownload |cut -d' ' -f1`
 fi
 if [ ! -d ~/eclipse -a -e "$eclipseDownload" ]; then
 	if [ "$eclipseDownloadHash" = "$eclipseDownloadMD5" ]; then
-		echo "Installing Eclipse Luna..."
+		echo "Installing Eclipse JEE..."
 		tar -C ~/ -xzf "$eclipseDownload"
 	else
 		echo 'Eclipse Luna not completely downloaded, cannot install.'
