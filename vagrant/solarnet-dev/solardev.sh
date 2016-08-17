@@ -146,24 +146,31 @@ if [ ! -e ~/git/solarnetwork-node/net.solarnetwork.node.setup.web/web/WEB-INF/pa
 fi
 
 eclipseDownload=/var/tmp/eclipse.tgz
-eclipseDownloadMD5=d8e1b995e95dbec95d69d62ddf6f94f6
+eclipseName=Neon
+eclipseDownloadSHA512=4449200d77a0ea25ead72f2e47e135f0a7c546d1c484ab2ed928dc09fe191d59820bf4924d151c9d08c8d704b4d3212c13e3e4c2275b7a56b5adc2cf7709ae66
 eclipseDownloadHash=
+
+eclipseHashFile () {
+	echo "Verifying Eclipse download..."
+	eclipseDownloadHash=`sha512sum $eclipseDownload |cut -d' ' -f1`
+}
+
 if [ -e "$eclipseDownload" ]; then
-	eclipseDownloadHash=`md5sum $eclipseDownload |cut -d' ' -f1`
+	eclipseHashFile
 fi
-if [ "$eclipseDownloadHash" != "$eclipseDownloadMD5" ]; then
-	echo 'Downloading Eclipse JEE...'
-	curl -C - -L -s -S -o $eclipseDownload 'http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/luna/SR2/eclipse-jee-luna-SR2-linux-gtk.tar.gz&r=1'
-fi
-if [ -e "$eclipseDownload" ]; then
-	eclipseDownloadHash=`md5sum $eclipseDownload |cut -d' ' -f1`
+if [ "$eclipseDownloadHash" != "$eclipseDownloadSHA512" ]; then
+	echo "Downloading Eclipse JEE ($eclipseName)..."
+	curl -C - -L -s -S -o $eclipseDownload 'http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/neon/R/eclipse-jee-neon-R-linux-gtk.tar.gz&r=1'
+	if [ -e "$eclipseDownload" ]; then
+		eclipseHashFile
+	fi
 fi
 if [ ! -d ~/eclipse -a -e "$eclipseDownload" ]; then
-	if [ "$eclipseDownloadHash" = "$eclipseDownloadMD5" ]; then
-		echo "Installing Eclipse JEE..."
+	if [ "$eclipseDownloadHash" = "$eclipseDownloadSHA512" ]; then
+		echo "Installing Eclipse JEE ($eclipseName)..."
 		tar -C ~/ -xzf "$eclipseDownload"
 	else
-		echo 'Eclipse Luna not completely downloaded, cannot install.'
+		echo "Eclipse $eclipseName not completely downloaded, cannot install."
 	fi
 fi
 
