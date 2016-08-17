@@ -28,7 +28,7 @@ sudo apt-get update
 echo 'Installing X...'
 sudo apt-get install -y xorg fluxbox
 
-echo 'Installing Postgres $PGVER and Java $JAVAVER...'
+echo "Installing Postgres $PGVER and Java $JAVAVER..."
 sudo apt-get install -y postgresql-$PGVER postgresql-$PGVER-plv8 postgresql-contrib-$PGVER pgadmin3 git git-flow openjdk-$JAVAVER-jdk librxtx-java
 
 echo 'Installing web browsers...'
