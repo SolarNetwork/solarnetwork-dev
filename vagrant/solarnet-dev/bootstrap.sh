@@ -33,7 +33,8 @@ echo "Installing Postgres $PGVER and Java $JAVAVER..."
 sudo apt-get install -y postgresql-$PGVER postgresql-$PGVER-plv8 postgresql-contrib-$PGVER pgadmin3 git git-flow openjdk-$JAVAVER-jdk librxtx-java
 
 echo 'Installing web browsers...'
-sudo apt-get install -y firefox libwebkitgtk-1.0-0
+# Note libwebkitgtk is required for Eclipse to support an internal browser
+sudo apt-get install -y firefox libwebkitgtk-3.0-0
 
 if [ -e /usr/share/java/RXTXcomm.jar -a -d /usr/lib/jvm/java-$JAVAVER-openjdk-i386/jre/lib/ext \
 		-a ! -e /usr/lib/jvm/java-$JAVAVER-openjdk-i386/jre/lib/ext/RXTXcomm.jar ]; then
