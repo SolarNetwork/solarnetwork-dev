@@ -27,7 +27,7 @@ sudo apt-get update
 
 echo 'Installing X...'
 # Note xserver-xorg-legacy was only way I could find to get X to start as solardev on login from console
-sudo apt-get install -y language-pack-en xorg xserver-xorg-legacy fluxbox
+sudo apt-get install -y language-pack-en xorg xserver-xorg-legacy fluxbox virtualbox-guest-dkms
 
 echo "Installing Postgres $PGVER and Java $JAVAVER..."
 sudo apt-get install -y postgresql-$PGVER postgresql-$PGVER-plv8 postgresql-contrib-$PGVER pgadmin3 git git-flow openjdk-$JAVAVER-jdk librxtx-java
