@@ -1,8 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
-PGVER=9.6
-JAVAVER=8
-HOST=solarnetworkdev.net
+JAVAVER=$1
+PGVER=$2
+HOST=$3
+DESKTOP_PACKAGES=${@:4}
+
+echo "Installing Desktop Packages: $DESKTOP_PACKAGES"
 
 grep -q solarnetworkdev /etc/hosts
 if [ $? -ne 0 ]; then
@@ -24,10 +27,10 @@ fi
 
 echo 'Updating package cache...'
 sudo apt-get update
+sudo apt-get upgrade -y
 
 echo 'Installing X...'
-# Note xserver-xorg-legacy was only way I could find to get X to start as solardev on login from console
-sudo apt-get install -y language-pack-en xorg xserver-xorg-legacy fluxbox
+sudo apt-get install -y $DESKTOP_PACKAGES
 
 echo "Installing Postgres $PGVER and Java $JAVAVER..."
 sudo apt-get install -y postgresql-$PGVER postgresql-$PGVER-plv8 postgresql-contrib-$PGVER pgadmin3 git git-flow openjdk-$JAVAVER-jdk librxtx-java
@@ -103,5 +106,13 @@ if [ ! -e /etc/sudoers.d/solardev -a -e /vagrant/solardev.sudoers ]; then
 fi
 
 if [ -x /vagrant/solardev.sh ]; then
-	sudo -i -u solardev /vagrant/solardev.sh
+
+  # If fluxbox is included then configure
+  SETUP_FLUXBOX=false
+  if [[ $DESKTOP_PACKAGES == *"fluxbox"* ]]; then
+    echo 'Fluxbox installed and will be configured'
+    SETUP_FLUXBOX=true
+  fi
+
+	sudo -i -u solardev /vagrant/solardev.sh $SETUP_FLUXBOX
 fi

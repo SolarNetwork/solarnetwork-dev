@@ -1,7 +1,9 @@
 #!/bin/bash
 
+SETUP_FLUXBOX=$1
+
 # Setup .xinitrc to launch Fluxbox
-if [ ! -e ~/.xinitrc ]; then
+if $SETUP_FLUXBOX && [ ! -e ~/.xinitrc ]; then
 	echo 'Configuring Fluxbox in .xinitrc...'
 	echo "exec startfluxbox" > ~/.xinitrc
 fi

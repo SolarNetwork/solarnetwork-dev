@@ -1,6 +1,52 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+local_env_config_file="Vagrantfile.local"
+#------------------------------------------------------------------------------
+# VM Environment and parameter configuration
+# These settings can be overridden by creating a file named Vagrantfile.local
+#------------------------------------------------------------------------------
+vm_define="solarnet"
+bootstrap_path="bootstrap.sh"
+vm_name="SolarNet Dev1"
+basebox_name="ubuntu/zesty32"
+no_of_cpus=1
+memory_size=1024
+
+postgre_version=9.6
+java_version=8
+
+# Note xserver-xorg-legacy was only way I could find to get X to start as solardev on login from console
+desktop_packages="language-pack-en xorg xserver-xorg-legacy fluxbox"
+
+solarnet_host="solarnetworkdev.net"
+
+# Read any user specific configuration overrides - cater for this file not existing
+begin
+  localsettings = File.read local_env_config_file
+  eval localsettings
+  rescue Errno::ENOENT
+    #print "No "+local_env_config_file+" found\n"
+end
+
+#------------------------------------------------------------------------------
+# Check for required vagrant plugins
+#------------------------------------------------------------------------------
+required_plugins = %w( vagrant-vbguest)
+missing_plugins=false
+required_plugins.each do |plugin|
+  missing_plugins=true unless Vagrant.has_plugin? plugin
+end
+if missing_plugins
+  puts "\nRequired vagrant plugins are missing. Please install as listed below and run 'vagrant up' again".red
+  puts "Run 'vagrant plugin list' to see the list of installed plugins".red
+  puts "Install missing plugins as follows:".red
+  required_plugins.each do |plugin|
+    puts "  vagrant plugin install #{plugin}".red unless Vagrant.has_plugin? plugin
+  end
+  exit
+end
+
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
@@ -9,11 +55,11 @@ Vagrant.configure(2) do |config|
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
-  config.vm.define "solarnet"
+  config.vm.define vm_define
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "ubuntu/zesty32"
+  config.vm.box = basebox_name
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -49,9 +95,11 @@ Vagrant.configure(2) do |config|
     vb.gui = true
 
     # Customize the amount of memory on the VM:
-    vb.memory = "1024"
+    vb.memory = memory_size
 
-    vb.name = "SolarNet Dev"
+    vb.cpus = no_of_cpus
+
+    vb.name = vm_name
   end
 
   # View the documentation for the provider you are using for more
@@ -67,5 +115,9 @@ Vagrant.configure(2) do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
-  config.vm.provision :shell, path: "bootstrap.sh"
+  config.vm.provision :shell, path: bootstrap_path, args:
+    java_version.to_s + " " +
+    postgre_version.to_s + " " +
+    solarnet_host + " " +
+    desktop_packages
 end
