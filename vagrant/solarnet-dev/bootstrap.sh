@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PGVER=9.5
+PGVER=9.6
 JAVAVER=8
 HOST=solarnetworkdev.net
 
@@ -15,7 +15,7 @@ if [ $? -ne 0 ]; then
 
 	sudo hostname $HOST
 
-	sed "s/^127.0.0.1 localhost$/127.0.0.1 $HOST localhost/" /etc/hosts >/tmp/hosts.new
+	sed "s/^127.0.0.1[[:space:]]*localhost/127.0.0.1 $HOST localhost/" /etc/hosts >/tmp/hosts.new
 	chmod 644 /tmp/hosts.new
 	sudo chown root:root /tmp/hosts.new
 	sudo cp -a /etc/hosts /etc/hosts.bak
@@ -94,6 +94,12 @@ if [ $? -ne 0 ]; then
 	sudo -u postgres createdb -E UNICODE -l C -T template0 -O solarnet_test solarnet_unittest
 	sudo -u postgres createlang plv8 solarnet_unittest
 	sudo -u postgres psql -U postgres -d solarnet_unittest -c "CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public;"
+fi
+
+if [ ! -e /etc/sudoers.d/solardev -a -e /vagrant/solardev.sudoers ]; then
+	echo 'Creating sudoers file for solardev user...'
+	sudo cp /vagrant/solardev.sudoers /etc/sudoers.d/solardev
+	sudo chmod 644 /etc/sudoers.d/solardev
 fi
 
 if [ -x /vagrant/solardev.sh ]; then
