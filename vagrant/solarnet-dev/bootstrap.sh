@@ -15,7 +15,7 @@ if [ $? -ne 0 ]; then
 
 	sudo hostname $HOST
 
-	sed "s/^127.0.0.1 localhost$/127.0.0.1 $HOST localhost/" /etc/hosts >/tmp/hosts.new
+	sed "s/^127.0.0.1[[:space:]]*localhost/127.0.0.1 $HOST localhost/" /etc/hosts >/tmp/hosts.new
 	chmod 644 /tmp/hosts.new
 	sudo chown root:root /tmp/hosts.new
 	sudo cp -a /etc/hosts /etc/hosts.bak
