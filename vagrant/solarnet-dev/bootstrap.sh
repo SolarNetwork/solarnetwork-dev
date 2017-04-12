@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PGVER=9.5
+PGVER=9.6
 JAVAVER=8
 HOST=solarnetworkdev.net
 
