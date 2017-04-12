@@ -316,4 +316,8 @@ cat <<EOF
 SolarNetwork development environment setup complete. Log into the VM as
 solardev:solardev and Eclipse will launch automatically. Right-click on
 the desktop to access a menu of other options.
+
+NOTE: If X fails to start via tty1, login on tty2 and run `startx` to
+start X and have Eclipse launch automatically. There is a bug in Ubuntu
+that is causing X to fail to launch automatically.
 EOF
