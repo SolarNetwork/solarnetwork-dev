@@ -96,6 +96,12 @@ if [ $? -ne 0 ]; then
 	sudo -u postgres psql -U postgres -d solarnet_unittest -c "CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public;"
 fi
 
+if [ ! -e /etc/sudoers.d/solardev -a -e /vagrant/solardev.sudoers ]; then
+	echo 'Creating sudoers file for solardev user...'
+	sudo cp /vagrant/solardev.sudoers /etc/sudoers.d/solardev
+	sudo chmod 644 /etc/sudoers.d/solardev
+fi
+
 if [ -x /vagrant/solardev.sh ]; then
 	sudo -i -u solardev /vagrant/solardev.sh
 fi

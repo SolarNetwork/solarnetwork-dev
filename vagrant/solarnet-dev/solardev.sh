@@ -36,7 +36,7 @@ if [ $? -ne 0 ]; then
 	echo 'Creating solarnet database tables...'
 	cd ~/git/solarnetwork-central/net.solarnetwork.central.datum/defs/sql/postgres
 	# for some reason, plv8 often chokes on the inline comments, so strip them out
-	sed -e '/^\/\*/d' -e '/^ \*/d' postgres-init-plv8.sql |psql -d solarnetwork -U postgres
+	sed -e '/^\/\*/d' -e '/^ \*/d' postgres-init-plv8.sql |sudo -u postgres psql -d solarnetwork -U postgres
 	psql -d solarnetwork -U solarnet -f postgres-init.sql
 fi
 
@@ -46,7 +46,7 @@ if [ $? -ne 0 ]; then
 	echo 'Creating solarnet_unittest database tables...'
 	cd ~/git/solarnetwork-central/net.solarnetwork.central.datum/defs/sql/postgres
 	# for some reason, plv8 often chokes on the inline comments, so strip them out
-	sed -e '/^\/\*/d' -e '/^ \*/d' postgres-init-plv8.sql |psql -d solarnet_unittest -U postgres
+	sed -e '/^\/\*/d' -e '/^ \*/d' postgres-init-plv8.sql |sudo -u postgres psql -d solarnet_unittest -U postgres
 	psql -d solarnet_unittest -U solarnet_test -f postgres-init.sql
 fi
 
