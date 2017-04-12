@@ -149,7 +149,7 @@ fi
 
 eclipseDownload=/var/tmp/eclipse.tgz
 eclipseName=Neon
-eclipseDownloadSHA512=4449200d77a0ea25ead72f2e47e135f0a7c546d1c484ab2ed928dc09fe191d59820bf4924d151c9d08c8d704b4d3212c13e3e4c2275b7a56b5adc2cf7709ae66
+eclipseDownloadSHA512=1fd23f05388f382c338d57727fec37e087f93baf0abd71e26ea3eda56b633fa9b042b5022fe717d578a31d5545f716ec1ba25d3945f84cbe0b7a39d335cb51b0
 eclipseDownloadHash=
 
 eclipseHashFile () {
@@ -162,7 +162,7 @@ if [ -e "$eclipseDownload" ]; then
 fi
 if [ "$eclipseDownloadHash" != "$eclipseDownloadSHA512" ]; then
 	echo "Downloading Eclipse JEE ($eclipseName)..."
-	curl -C - -L -s -S -o $eclipseDownload 'http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/neon/R/eclipse-jee-neon-R-linux-gtk.tar.gz&r=1'
+	curl -C - -L -s -S -o $eclipseDownload 'http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/neon/3/eclipse-jee-neon-3-linux-gtk-x86_64.tar.gz&r=1'
 	if [ -e "$eclipseDownload" ]; then
 		eclipseHashFile
 	fi
@@ -318,4 +318,8 @@ cat <<EOF
 SolarNetwork development environment setup complete. Log into the VM as
 solardev:solardev and Eclipse will launch automatically. Right-click on
 the desktop to access a menu of other options.
+
+NOTE: If X fails to start via tty1, login on tty2 and run `startx` to
+start X and have Eclipse launch automatically. There is a bug in Ubuntu
+that is causing X to fail to launch automatically.
 EOF

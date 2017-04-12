@@ -9,15 +9,15 @@ local_env_config_file="Vagrantfile.local"
 vm_define="solarnet"
 bootstrap_path="bootstrap.sh"
 vm_name="SolarNet Dev1"
-basebox_name="ubuntu/zesty32"
+basebox_name="ubuntu/zesty64”
 no_of_cpus=1
-memory_size=1024
+memory_size=2048
 
 postgre_version=9.6
 java_version=8
 
 # Note xserver-xorg-legacy was only way I could find to get X to start as solardev on login from console
-desktop_packages="language-pack-en xorg xserver-xorg-legacy fluxbox"
+desktop_packages="language-pack-en xorg xserver-xorg-legacy fluxbox virtualbox-guest-dkms"
 
 solarnet_host="solarnetworkdev.net"
 
@@ -95,6 +95,7 @@ Vagrant.configure(2) do |config|
     vb.gui = true
 
     # Customize the amount of memory on the VM:
+
     vb.memory = memory_size
 
     vb.cpus = no_of_cpus
