@@ -58,7 +58,7 @@ if [ ! -d ~/git/solarnetwork-build/solarnetwork-osgi-target/config ]; then
 	cp -a ~/git/solarnetwork-build/solarnetwork-osgi-target/example/config ~/git/solarnetwork-build/solarnetwork-osgi-target/
 
 	# Enable the SolarIn SSL connector in tomcat-server.xml
-	sed -e '9s/$/-->/' -e '16d' ~/git/solarnetwork-build/solarnetwork-osgi-target/example/config/tomcat-server.xml \
+	sed -e '14s/$/-->/' -e '21d' ~/git/solarnetwork-build/solarnetwork-osgi-target/example/config/tomcat-server.xml \
 		> ~/git/solarnetwork-build/solarnetwork-osgi-target/config/tomcat-server.xml
 fi
 
@@ -94,7 +94,15 @@ if [ ! -d ~/git/solarnetwork-build/solarnetwork-osgi-target/conf/tls ]; then
 	if cd ~/git/solarnetwork-build/solarnetwork-osgi-target/conf/tls; then
 		ln -s ../../var/DeveloperCA/central.jks
 		ln -s ../../var/DeveloperCA/central-trust.jks
+		ln -s ../../var/DeveloperCA/central-trust.jks trust.jks
 	fi
+fi
+
+if [ ! -e ~/git/solarnetwork-build/solarnetwork-osgi-target/configurations/services/net.solarnetwork.node.setup.cfg ]; then
+	echo 'Creating developer SolarNode TLS configuration...'
+	cat > ~/git/solarnetwork-build/solarnetwork-osgi-target/configurations/services/net.solarnetwork.node.setup.cfg <<-EOF
+		PKIService.trustStorePassword = dev123
+EOF
 fi
 
 if [ ! -e ~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/log4j.properties ]; then
