@@ -290,7 +290,9 @@ if [ -x ~/eclipse/eclipse -a ! -e ~/.fluxbox/startup ]; then
 	cat > ~/.fluxbox/startup <<EOF
 #!/bin/sh
 
-xmodmap "/home/solardev/.Xmodmap"
+if [ -e ~/.Xmodmap ]; then
+	xmodmap ~/.Xmodmap
+fi
 
 if [ -x ~/eclipse/eclipse ]; then
 	~/eclipse/eclipse -data ~/workspace &
