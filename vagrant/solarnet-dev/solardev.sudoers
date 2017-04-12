@@ -1,0 +1,2 @@
+# Allow solardev to run psql as the postgres user without any password
+solardev ALL = (postgres) NOPASSWD: /usr/bin/psql

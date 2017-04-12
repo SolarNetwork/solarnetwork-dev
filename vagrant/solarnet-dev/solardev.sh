@@ -36,7 +36,7 @@ if [ $? -ne 0 ]; then
 	echo 'Creating solarnet database tables...'
 	cd ~/git/solarnetwork-central/net.solarnetwork.central.datum/defs/sql/postgres
 	# for some reason, plv8 often chokes on the inline comments, so strip them out
-	sed -e '/^\/\*/d' -e '/^ \*/d' postgres-init-plv8.sql |psql -d solarnetwork -U solarnet
+	sed -e '/^\/\*/d' -e '/^ \*/d' postgres-init-plv8.sql |sudo -u postgres psql -d solarnetwork -U postgres
 	psql -d solarnetwork -U solarnet -f postgres-init.sql
 fi
 
@@ -46,7 +46,7 @@ if [ $? -ne 0 ]; then
 	echo 'Creating solarnet_unittest database tables...'
 	cd ~/git/solarnetwork-central/net.solarnetwork.central.datum/defs/sql/postgres
 	# for some reason, plv8 often chokes on the inline comments, so strip them out
-	sed -e '/^\/\*/d' -e '/^ \*/d' postgres-init-plv8.sql |psql -d solarnet_unittest -U solarnet_test
+	sed -e '/^\/\*/d' -e '/^ \*/d' postgres-init-plv8.sql |sudo -u postgres psql -d solarnet_unittest -U postgres
 	psql -d solarnet_unittest -U solarnet_test -f postgres-init.sql
 fi
 
@@ -58,7 +58,7 @@ if [ ! -d ~/git/solarnetwork-build/solarnetwork-osgi-target/config ]; then
 	cp -a ~/git/solarnetwork-build/solarnetwork-osgi-target/example/config ~/git/solarnetwork-build/solarnetwork-osgi-target/
 
 	# Enable the SolarIn SSL connector in tomcat-server.xml
-	sed -e '9s/$/-->/' -e '16d' ~/git/solarnetwork-build/solarnetwork-osgi-target/example/config/tomcat-server.xml \
+	sed -e '14s/$/-->/' -e '21d' ~/git/solarnetwork-build/solarnetwork-osgi-target/example/config/tomcat-server.xml \
 		> ~/git/solarnetwork-build/solarnetwork-osgi-target/config/tomcat-server.xml
 fi
 
@@ -94,7 +94,15 @@ if [ ! -d ~/git/solarnetwork-build/solarnetwork-osgi-target/conf/tls ]; then
 	if cd ~/git/solarnetwork-build/solarnetwork-osgi-target/conf/tls; then
 		ln -s ../../var/DeveloperCA/central.jks
 		ln -s ../../var/DeveloperCA/central-trust.jks
+		ln -s ../../var/DeveloperCA/central-trust.jks trust.jks
 	fi
+fi
+
+if [ ! -e ~/git/solarnetwork-build/solarnetwork-osgi-target/configurations/services/net.solarnetwork.node.setup.cfg ]; then
+	echo 'Creating developer SolarNode TLS configuration...'
+	cat > ~/git/solarnetwork-build/solarnetwork-osgi-target/configurations/services/net.solarnetwork.node.setup.cfg <<-EOF
+		PKIService.trustStorePassword = dev123
+EOF
 fi
 
 if [ ! -e ~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/log4j.properties ]; then
@@ -146,24 +154,31 @@ if [ ! -e ~/git/solarnetwork-node/net.solarnetwork.node.setup.web/web/WEB-INF/pa
 fi
 
 eclipseDownload=/var/tmp/eclipse.tgz
-eclipseDownloadMD5=d8e1b995e95dbec95d69d62ddf6f94f6
+eclipseName=Neon
+eclipseDownloadSHA512=1fd23f05388f382c338d57727fec37e087f93baf0abd71e26ea3eda56b633fa9b042b5022fe717d578a31d5545f716ec1ba25d3945f84cbe0b7a39d335cb51b0
 eclipseDownloadHash=
+
+eclipseHashFile () {
+	echo "Verifying Eclipse download..."
+	eclipseDownloadHash=`sha512sum $eclipseDownload |cut -d' ' -f1`
+}
+
 if [ -e "$eclipseDownload" ]; then
-	eclipseDownloadHash=`md5sum $eclipseDownload |cut -d' ' -f1`
+	eclipseHashFile
 fi
-if [ "$eclipseDownloadHash" != "$eclipseDownloadMD5" ]; then
-	echo 'Downloading Eclipse JEE...'
-	curl -C - -L -s -S -o $eclipseDownload 'http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/luna/SR2/eclipse-jee-luna-SR2-linux-gtk.tar.gz&r=1'
-fi
-if [ -e "$eclipseDownload" ]; then
-	eclipseDownloadHash=`md5sum $eclipseDownload |cut -d' ' -f1`
+if [ "$eclipseDownloadHash" != "$eclipseDownloadSHA512" ]; then
+	echo "Downloading Eclipse JEE ($eclipseName)..."
+	curl -C - -L -s -S -o $eclipseDownload 'http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/neon/3/eclipse-jee-neon-3-linux-gtk-x86_64.tar.gz&r=1'
+	if [ -e "$eclipseDownload" ]; then
+		eclipseHashFile
+	fi
 fi
 if [ ! -d ~/eclipse -a -e "$eclipseDownload" ]; then
-	if [ "$eclipseDownloadHash" = "$eclipseDownloadMD5" ]; then
-		echo "Installing Eclipse JEE..."
+	if [ "$eclipseDownloadHash" = "$eclipseDownloadSHA512" ]; then
+		echo "Installing Eclipse JEE ($eclipseName)..."
 		tar -C ~/ -xzf "$eclipseDownload"
 	else
-		echo 'Eclipse Luna not completely downloaded, cannot install.'
+		echo "Eclipse $eclipseName not completely downloaded, cannot install."
 	fi
 fi
 
@@ -275,7 +290,9 @@ if [ -x ~/eclipse/eclipse -a ! -e ~/.fluxbox/startup ]; then
 	cat > ~/.fluxbox/startup <<EOF
 #!/bin/sh
 
-xmodmap "/home/solardev/.Xmodmap"
+if [ -e ~/.Xmodmap ]; then
+	xmodmap ~/.Xmodmap
+fi
 
 if [ -x ~/eclipse/eclipse ]; then
 	~/eclipse/eclipse -data ~/workspace &
@@ -306,7 +323,15 @@ fi
 
 cat <<EOF
 
-SolarNetwork development environment setup complete. Log into the VM as
-solardev:solardev and Eclipse will launch automatically. Right-click on
-the desktop to access a menu of other options.
+SolarNetwork development environment setup complete. Please reboot the
+virtual machine like:
+
+vagrant halt
+vagrant up
+
+Then log into the VM as solardev:solardev and Eclipse will launch
+automatically. Right-click on the desktop to access a menu of other options.
+
+NOTE: If X fails to start via tty1, login on tty2 and run `startx` to
+start X and have Eclipse launch automatically.
 EOF
