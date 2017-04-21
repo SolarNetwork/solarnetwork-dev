@@ -29,24 +29,6 @@ begin
     #print "No "+local_env_config_file+" found\n"
 end
 
-#------------------------------------------------------------------------------
-# Check for required vagrant plugins
-#------------------------------------------------------------------------------
-required_plugins = %w( vagrant-vbguest)
-missing_plugins=false
-required_plugins.each do |plugin|
-  missing_plugins=true unless Vagrant.has_plugin? plugin
-end
-if missing_plugins
-  puts "\nRequired vagrant plugins are missing. Please install as listed below and run 'vagrant up' again".red
-  puts "Run 'vagrant plugin list' to see the list of installed plugins".red
-  puts "Install missing plugins as follows:".red
-  required_plugins.each do |plugin|
-    puts "  vagrant plugin install #{plugin}".red unless Vagrant.has_plugin? plugin
-  end
-  exit
-end
-
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
