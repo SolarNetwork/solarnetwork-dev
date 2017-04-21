@@ -229,6 +229,7 @@ EOF
 		"solarnetwork-central/net.solarnetwork.central.common.mail.javamail" \
 		"solarnetwork-central/net.solarnetwork.central.user.pki.dogtag" \
 		"solarnetwork-central/net.solarnetwork.central.user.pki.dogtag.test" \
+		"solarnetwork-common/net.solarnetwork.pidfile" \
 		"solarnetwork-node/net.solarnetwork.node.config" \
 		"solarnetwork-node/net.solarnetwork.node.setup.developer" \
 		"solarnetwork-node/net.solarnetwork.node.upload.mock" )
