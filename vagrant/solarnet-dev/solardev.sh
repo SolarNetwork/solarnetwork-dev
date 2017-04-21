@@ -296,17 +296,6 @@ exec fluxbox
 EOF
 fi
 
-# Install EGit
-# ls -1d ~/eclipse/features/org.eclipse.egit* >/dev/null 2>&1
-# if [ $? -ne 0 -a -x ~/eclipse/eclipse ]; then
-# 	echo 'Installing EGit...'
-# 	~/eclipse/eclipse -application org.eclipse.equinox.p2.director \
-# 		-repository http://download.eclipse.org/releases/luna \
-# 		-installIU org.eclipse.egit.feature.group \
-# 		-tag AddEGit \
-# 		-destination ~/eclipse/ -profile SDKProfile
-# fi
-
 if [ -x /usr/bin/fluxbox ]; then
 	cat <<EOF
 
