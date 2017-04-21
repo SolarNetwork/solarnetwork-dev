@@ -311,7 +311,7 @@ EOF
 fi
 
 if [ -x /usr/bin/fluxbox ]; then
-	cat <<EOF
+	cat <<"EOF"
 
 SolarNetwork development environment setup complete. Please reboot the
 virtual machine like:
