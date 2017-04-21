@@ -46,7 +46,8 @@ sudo apt-get install -y postgresql-$PGVER postgresql-$PGVER-plv8 postgresql-cont
 
 if [ -n "$DESKTOP_PACKAGES" ]; then
 	echo -e '\nInstalling web browsers...'
-	sudo apt-get install -y firefox libwebkitgtk-1.0-0
+	# Note libwebkitgtk is required for Eclipse to support an internal browser
+	sudo apt-get install -y firefox libwebkitgtk-3.0-0
 fi
 
 if [ -e /usr/share/java/RXTXcomm.jar -a -d /usr/lib/jvm/java-$JAVAVER-openjdk-i386/jre/lib/ext \

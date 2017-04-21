@@ -60,7 +60,7 @@ if [ ! -d ~/git/solarnetwork-build/solarnetwork-osgi-target/config ]; then
 	cp -a ~/git/solarnetwork-build/solarnetwork-osgi-target/example/config ~/git/solarnetwork-build/solarnetwork-osgi-target/
 
 	# Enable the SolarIn SSL connector in tomcat-server.xml
-	sed -e '9s/$/-->/' -e '16d' ~/git/solarnetwork-build/solarnetwork-osgi-target/example/config/tomcat-server.xml \
+	sed -e '14s/$/-->/' -e '21d' ~/git/solarnetwork-build/solarnetwork-osgi-target/example/config/tomcat-server.xml \
 		> ~/git/solarnetwork-build/solarnetwork-osgi-target/config/tomcat-server.xml
 fi
 
@@ -96,7 +96,15 @@ if [ ! -d ~/git/solarnetwork-build/solarnetwork-osgi-target/conf/tls ]; then
 	if cd ~/git/solarnetwork-build/solarnetwork-osgi-target/conf/tls; then
 		ln -s ../../var/DeveloperCA/central.jks
 		ln -s ../../var/DeveloperCA/central-trust.jks
+		ln -s ../../var/DeveloperCA/central-trust.jks trust.jks
 	fi
+fi
+
+if [ ! -e ~/git/solarnetwork-build/solarnetwork-osgi-target/configurations/services/net.solarnetwork.node.setup.cfg ]; then
+	echo 'Creating developer SolarNode TLS configuration...'
+	cat > ~/git/solarnetwork-build/solarnetwork-osgi-target/configurations/services/net.solarnetwork.node.setup.cfg <<-EOF
+		PKIService.trustStorePassword = dev123
+EOF
 fi
 
 if [ ! -e ~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/log4j.properties ]; then
@@ -281,7 +289,9 @@ if [ -x ~/eclipse/eclipse -a -x /usr/bin/fluxbox -a ! -e ~/.fluxbox/startup ]; t
 	cat > ~/.fluxbox/startup <<EOF
 #!/bin/sh
 
-xmodmap "/home/solardev/.Xmodmap"
+if [ -e ~/.Xmodmap ]; then
+	xmodmap ~/.Xmodmap
+fi
 
 if [ -x ~/eclipse/eclipse ]; then
 	~/eclipse/eclipse -data ~/workspace &
@@ -302,13 +312,17 @@ fi
 if [ -x /usr/bin/fluxbox ]; then
 	cat <<EOF
 
-SolarNetwork development environment setup complete. Log into the VM as
-solardev:solardev and Eclipse will launch automatically. Right-click on
-the desktop to access a menu of other options.
+SolarNetwork development environment setup complete. Please reboot the
+virtual machine like:
+
+vagrant halt
+vagrant up
+
+Then log into the VM as solardev:solardev and Eclipse will launch
+automatically. Right-click on the desktop to access a menu of other options.
 
 NOTE: If X fails to start via tty1, login on tty2 and run `startx` to
-start X and have Eclipse launch automatically. There is a bug in Ubuntu
-that is causing X to fail to launch automatically.
+start X and have Eclipse launch automatically.
 EOF
 else
 	cat <<EOF
