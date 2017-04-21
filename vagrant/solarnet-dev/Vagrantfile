@@ -8,7 +8,7 @@ local_env_config_file="Vagrantfile.local"
 #------------------------------------------------------------------------------
 vm_define="solarnet"
 bootstrap_path="bootstrap.sh"
-vm_name="SolarNet Dev1"
+vm_name="SolarNet Dev"
 basebox_name="ubuntu/zesty64"
 no_of_cpus=1
 memory_size=2048
