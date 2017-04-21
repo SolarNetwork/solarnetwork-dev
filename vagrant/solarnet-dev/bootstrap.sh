@@ -5,8 +5,6 @@ PGVER=$2
 HOST=$3
 DESKTOP_PACKAGES=${@:4}
 
-echo "Installing Desktop Packages: $DESKTOP_PACKAGES"
-
 grep -q $HOST /etc/hosts
 if [ $? -ne 0 ]; then
 	echo "Setting up $HOST host"
@@ -29,8 +27,10 @@ echo 'Updating package cache...'
 sudo apt-get update
 sudo apt-get upgrade -y
 
-echo 'Installing X...'
-sudo apt-get install -y $DESKTOP_PACKAGES
+if [ -n "$DESKTOP_PACKAGES" ]; then
+	echo -e "\nInstalling Desktop Packages: $DESKTOP_PACKAGES"
+	sudo apt-get install -y $DESKTOP_PACKAGES
+fi
 
 echo "Installing Postgres $PGVER and Java $JAVAVER..."
 sudo apt-get install -y postgresql-$PGVER postgresql-$PGVER-plv8 postgresql-contrib-$PGVER pgadmin3 git git-flow openjdk-$JAVAVER-jdk librxtx-java
