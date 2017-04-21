@@ -7,7 +7,7 @@ DESKTOP_PACKAGES=${@:4}
 
 echo "Installing Desktop Packages: $DESKTOP_PACKAGES"
 
-grep -q solarnetworkdev /etc/hosts
+grep -q $HOST /etc/hosts
 if [ $? -ne 0 ]; then
 	echo "Setting up $HOST host"
 	echo $HOST >>/tmp/hostname.new
