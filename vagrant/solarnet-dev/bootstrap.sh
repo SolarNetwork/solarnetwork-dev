@@ -29,6 +29,9 @@ sudo apt-get update
 echo -e '\nUpgrading outdated packages...'
 sudo apt-get upgrade -y
 
+echo -e '\nInstalling language-pack...'
+sudo apt-get install -y language-pack-en
+
 if [ -n "$DESKTOP_PACKAGES" ]; then
 	echo -e "\nInstalling Desktop Packages: $DESKTOP_PACKAGES"
 	sudo apt-get install -y $DESKTOP_PACKAGES
