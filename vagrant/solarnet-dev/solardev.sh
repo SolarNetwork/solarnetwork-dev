@@ -141,65 +141,67 @@ if [ ! -e ~/git/solarnetwork-node/net.solarnetwork.node.setup.web/web/WEB-INF/pa
 		~/git/solarnetwork-node/net.solarnetwork.node.setup.web/web/WEB-INF/packtag.user.properties
 fi
 
-eclipseDownload=/var/tmp/eclipse.tgz
-eclipseName=Neon
-eclipseDownloadSHA512=1fd23f05388f382c338d57727fec37e087f93baf0abd71e26ea3eda56b633fa9b042b5022fe717d578a31d5545f716ec1ba25d3945f84cbe0b7a39d335cb51b0
-eclipseDownloadHash=
+if [ -x /usr/bin/fluxbox ]; then
+	eclipseDownload=/var/tmp/eclipse.tgz
+	eclipseName=Neon
+	eclipseDownloadSHA512=1fd23f05388f382c338d57727fec37e087f93baf0abd71e26ea3eda56b633fa9b042b5022fe717d578a31d5545f716ec1ba25d3945f84cbe0b7a39d335cb51b0
+	eclipseDownloadHash=
 
-eclipseHashFile () {
-	echo -e '\nVerifying Eclipse download...'
-	eclipseDownloadHash=`sha512sum $eclipseDownload |cut -d' ' -f1`
-}
+	eclipseHashFile () {
+		echo -e '\nVerifying Eclipse download...'
+		eclipseDownloadHash=`sha512sum $eclipseDownload |cut -d' ' -f1`
+	}
 
-if [ -e "$eclipseDownload" ]; then
-	eclipseHashFile
-fi
-if [ "$eclipseDownloadHash" != "$eclipseDownloadSHA512" ]; then
-	echo -e "\nDownloading Eclipse JEE ($eclipseName)..."
-	curl -C - -L -s -S -o $eclipseDownload 'http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/neon/3/eclipse-jee-neon-3-linux-gtk-x86_64.tar.gz&r=1'
 	if [ -e "$eclipseDownload" ]; then
 		eclipseHashFile
 	fi
-fi
-if [ ! -d ~/eclipse -a -e "$eclipseDownload" ]; then
-	if [ "$eclipseDownloadHash" = "$eclipseDownloadSHA512" ]; then
-		echo -e "\nInstalling Eclipse JEE ($eclipseName)..."
-		tar -C ~/ -xzf "$eclipseDownload"
-	else
-		>&2 echo "Eclipse $eclipseName not completely downloaded, cannot install."
+	if [ "$eclipseDownloadHash" != "$eclipseDownloadSHA512" ]; then
+		echo -e "\nDownloading Eclipse JEE ($eclipseName)..."
+		curl -C - -L -s -S -o $eclipseDownload 'http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/neon/3/eclipse-jee-neon-3-linux-gtk-x86_64.tar.gz&r=1'
+		if [ -e "$eclipseDownload" ]; then
+			eclipseHashFile
+		fi
 	fi
-fi
+	if [ ! -d ~/eclipse -a -e "$eclipseDownload" ]; then
+		if [ "$eclipseDownloadHash" = "$eclipseDownloadSHA512" ]; then
+			echo -e "\nInstalling Eclipse JEE ($eclipseName)..."
+			tar -C ~/ -xzf "$eclipseDownload"
+		else
+			>&2 echo "Eclipse $eclipseName not completely downloaded, cannot install."
+		fi
+	fi
 
-if [ ! -d  ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings ]; then
-	mkdir -p ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings
-fi
+	if [ ! -d  ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings ]; then
+		mkdir -p ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings
+	fi
 
-# Add Git repos to Eclipse configuration
-if [ ! -e ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.egit.core.prefs ]; then
-	echo -e '\nConfiguring SolarNetwork git repositories in Eclipse...'
-	cat > ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.egit.core.prefs <<EOF
+	# Add Git repos to Eclipse configuration
+	if [ ! -e ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.egit.core.prefs ]; then
+		echo -e '\nConfiguring SolarNetwork git repositories in Eclipse...'
+		cat > ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.egit.core.prefs <<EOF
 GitRepositoriesView.GitDirectories=/home/solardev/git/solarnetwork-central/.git\:/home/solardev/git/solarnetwork-common/.git\:/home/solardev/git/solarnetwork-node/.git\:/home/solardev/git/solarnetwork-build/.git\:/home/solardev/git/solarnetwork-external/.git\:
 RepositorySearchDialogSearchPath=/home/solardev/git
 eclipse.preferences.version=1
 EOF
-fi
+	fi
 
-# Add SolarNetwork target platform configuration
-if [ ! -e ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.pde.core.prefs ]; then
-	echo -e '\nConfiguring SolarNetwork Eclipse PDE target platform...'
-	cat > ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.pde.core.prefs <<EOF
+	# Add SolarNetwork target platform configuration
+	if [ ! -e ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.pde.core.prefs ]; then
+		echo -e '\nConfiguring SolarNetwork Eclipse PDE target platform...'
+		cat > ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.pde.core.prefs <<EOF
 eclipse.preferences.version=1
 workspace_target_handle=resource\:/solarnetwork-osgi-target/defs/solarnetwork-gemini.target
 EOF
-fi
-
-# Add SolarNetwork debug launch configuration to Eclipse
-if [ ! -e ~/workspace/.metadata/.plugins/org.eclipse.debug.core/.launches/SolarNetwork.launch -a -e /vagrant/SolarNetwork.launch ]; then
-	echo -e '\nCreating SolarNetwork Eclipse launch configuration...'
-	if [ ! -d ~/workspace/.metadata/.plugins/org.eclipse.debug.core/.launches ]; then
-		mkdir -p ~/workspace/.metadata/.plugins/org.eclipse.debug.core/.launches
 	fi
-	cp /vagrant/SolarNetwork.launch ~/workspace/.metadata/.plugins/org.eclipse.debug.core/.launches
+
+	# Add SolarNetwork debug launch configuration to Eclipse
+	if [ ! -e ~/workspace/.metadata/.plugins/org.eclipse.debug.core/.launches/SolarNetwork.launch -a -e /vagrant/SolarNetwork.launch ]; then
+		echo -e '\nCreating SolarNetwork Eclipse launch configuration...'
+		if [ ! -d ~/workspace/.metadata/.plugins/org.eclipse.debug.core/.launches ]; then
+			mkdir -p ~/workspace/.metadata/.plugins/org.eclipse.debug.core/.launches
+		fi
+		cp /vagrant/SolarNetwork.launch ~/workspace/.metadata/.plugins/org.eclipse.debug.core/.launches
+	fi
 fi
 
 elementIn () {
