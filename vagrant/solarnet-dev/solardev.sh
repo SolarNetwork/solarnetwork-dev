@@ -103,12 +103,6 @@ if [ ! -e ~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/l
 		~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/log4j.properties
 fi
 
-if [ ! -e ~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/log4j.properties ]; then
-	echo 'Creating platform logging configuration...'
-	cp ~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/example/log4j.properties \
-		~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/log4j.properties
-fi
-
 if [ ! -e ~/git/solarnetwork-external/org.eclipse.gemini.blueprint.extender.config/META-INF/spring/extender/solarnetwork-context.xml ]; then
 	echo 'Creating Gemini Extender configuration...'
 	cp ~/git/solarnetwork-external/org.eclipse.gemini.blueprint.extender.config/example/META-INF/spring/extender/solarnetwork-context.xml \
