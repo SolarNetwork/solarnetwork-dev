@@ -1,7 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-local_env_config_file="Vagrantfile.local"
 #------------------------------------------------------------------------------
 # VM Environment and parameter configuration
 # These settings can be overridden by creating a file named Vagrantfile.local
@@ -22,6 +21,7 @@ desktop_packages="language-pack-en xorg xserver-xorg-legacy fluxbox virtualbox-g
 solarnet_host="solarnetworkdev.net"
 
 # Read any user specific configuration overrides - cater for this file not existing
+local_env_config_file="Vagrantfile.local"
 begin
   localsettings = File.read local_env_config_file
   eval localsettings
