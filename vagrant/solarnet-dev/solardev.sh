@@ -1,10 +1,8 @@
 #!/bin/bash
 
-SETUP_FLUXBOX=$1
-
 # Setup .xinitrc to launch Fluxbox
-if $SETUP_FLUXBOX && [ ! -e ~/.xinitrc ]; then
-	echo 'Configuring Fluxbox in .xinitrc...'
+if [ ! -e ~/.xinitrc -a -x /usr/bin/fluxbox ]; then
+	echo -e '\nConfiguring Fluxbox in .xinitrc...'
 	echo "exec startfluxbox" > ~/.xinitrc
 fi
 
@@ -258,8 +256,8 @@ if [ ! -d ~/.fluxbox ]; then
 fi
 
 # Setup Fluxbox menu
-if [ ! -e ~/.fluxbox/menu ]; then
-	echo 'Configuring Fluxbox menu...'
+if [ -x /usr/bin/fluxbox -a ! -e ~/.fluxbox/menu ]; then
+	echo -e '\nConfiguring Fluxbox menu...'
 	cat > ~/.fluxbox/menu <<EOF
 [begin] (SolarNetwork Dev)
         [exec] (Eclipse) { ~/eclipse/eclipse -data ~/workspace } <~/eclipse/icon.xpm>
@@ -279,8 +277,8 @@ EOF
 fi
 
 # Set Eclipse to launch on Fluxbox startup
-if [ -x ~/eclipse/eclipse -a ! -e ~/.fluxbox/startup ]; then
-	echo 'Configuring Eclipse to start on login...'
+if [ -x ~/eclipse/eclipse -a -x /usr/bin/fluxbox -a ! -e ~/.fluxbox/startup ]; then
+	echo -e '\nConfiguring Eclipse to start on login...'
 	cat > ~/.fluxbox/startup <<EOF
 #!/bin/sh
 
@@ -313,7 +311,8 @@ fi
 # 		-destination ~/eclipse/ -profile SDKProfile
 # fi
 
-cat <<EOF
+if [ -x /usr/bin/fluxbox ]; then
+	cat <<EOF
 
 SolarNetwork development environment setup complete. Log into the VM as
 solardev:solardev and Eclipse will launch automatically. Right-click on
@@ -323,3 +322,10 @@ NOTE: If X fails to start via tty1, login on tty2 and run `startx` to
 start X and have Eclipse launch automatically. There is a bug in Ubuntu
 that is causing X to fail to launch automatically.
 EOF
+else
+	cat <<EOF
+
+SolarNetwork development environment setup complete. Log into the VM as
+solardev:solardev to access the Eclipse environment.
+EOF
+fi

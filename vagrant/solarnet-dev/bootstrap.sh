@@ -106,13 +106,5 @@ if [ ! -e /etc/sudoers.d/solardev -a -e /vagrant/solardev.sudoers ]; then
 fi
 
 if [ -x /vagrant/solardev.sh ]; then
-
-  # If fluxbox is included then configure
-  SETUP_FLUXBOX=false
-  if [[ $DESKTOP_PACKAGES == *"fluxbox"* ]]; then
-    echo 'Fluxbox installed and will be configured'
-    SETUP_FLUXBOX=true
-  fi
-
-	sudo -i -u solardev /vagrant/solardev.sh $SETUP_FLUXBOX
+	sudo -i -u solardev /vagrant/solardev.sh
 fi
