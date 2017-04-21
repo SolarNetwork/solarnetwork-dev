@@ -7,15 +7,17 @@ if [ ! -e ~/.xinitrc -a -x /usr/bin/fluxbox ]; then
 fi
 
 # Setup X to start on console login
-grep -q xinit ~/.bashrc
-if [ $? -ne 0 ]; then
-	echo -e '\nConfiguring X to start on login...'
-	cat >> ~/.bashrc <<"EOF"
+if [ -x /usr/bin/fluxbox ]; then
+	grep -q xinit ~/.bashrc
+	if [ $? -ne 0 ]; then
+		echo -e '\nConfiguring X to start on login...'
+		cat >> ~/.bashrc <<"EOF"
 
 if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
 	exec /usr/bin/xinit -- -nolisten tcp
 fi
 EOF
+	fi
 fi
 
 # Setup Eclipse
