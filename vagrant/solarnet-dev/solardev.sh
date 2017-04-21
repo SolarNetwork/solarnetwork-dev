@@ -141,6 +141,19 @@ if [ ! -e ~/git/solarnetwork-node/net.solarnetwork.node.setup.web/web/WEB-INF/pa
 		~/git/solarnetwork-node/net.solarnetwork.node.setup.web/web/WEB-INF/packtag.user.properties
 fi
 
+elementIn () {
+  local e
+  for e in "${@:2}"; do [[ "$e" == "$1" ]] && return 0; done
+  return 1
+}
+
+addTeamProviderRepo () {
+	echo "Adding $project to Eclipse Team Project Set..."
+	cat >> $2 <<EOF
+<project reference="1.0,https://github.com/SolarNetwork/${1%%/*}.git,develop,${1##*/}"/>
+EOF
+}
+
 if [ -x /usr/bin/fluxbox ]; then
 	eclipseDownload=/var/tmp/eclipse.tgz
 	eclipseName=Neon
@@ -202,51 +215,39 @@ EOF
 		fi
 		cp /vagrant/SolarNetwork.launch ~/workspace/.metadata/.plugins/org.eclipse.debug.core/.launches
 	fi
-fi
 
-elementIn () {
-  local e
-  for e in "${@:2}"; do [[ "$e" == "$1" ]] && return 0; done
-  return 1
-}
-
-addTeamProviderRepo () {
-	echo -e "\nAdding $project to Eclipse Team Project Set..."
-	cat >> $2 <<EOF
-<project reference="1.0,https://github.com/SolarNetwork/${1%%/*}.git,develop,${1##*/}"/>
-EOF
-}
-
-skipProjects=("solarnetwork-build/archiva-obr-plugin" \
-	"solarnetwork-build/net.solarnetwork.pki.sun.security" \
-	"solarnetwork-central/net.solarnetwork.central.common.mail.javamail" \
-	"solarnetwork-central/net.solarnetwork.central.user.pki.dogtag" \
-	"solarnetwork-central/net.solarnetwork.central.user.pki.dogtag.test" \
-	"solarnetwork-node/net.solarnetwork.node.config" \
-	"solarnetwork-node/net.solarnetwork.node.setup.developer" \
-	"solarnetwork-node/net.solarnetwork.node.upload.mock" )
-# Generate Eclipse Team Project Set of all projects to import
-if [ ! -e ~/SolarNetworkTeamProjectSet.psf ]; then
-	cat > ~/SolarNetworkTeamProjectSet.psf <<EOF
+	skipProjects=("solarnetwork-build/archiva-obr-plugin" \
+		"solarnetwork-build/net.solarnetwork.pki.sun.security" \
+		"solarnetwork-central/net.solarnetwork.central.common.mail.javamail" \
+		"solarnetwork-central/net.solarnetwork.central.user.pki.dogtag" \
+		"solarnetwork-central/net.solarnetwork.central.user.pki.dogtag.test" \
+		"solarnetwork-node/net.solarnetwork.node.config" \
+		"solarnetwork-node/net.solarnetwork.node.setup.developer" \
+		"solarnetwork-node/net.solarnetwork.node.upload.mock" )
+	# Generate Eclipse Team Project Set of all projects to import
+	if [ ! -e ~/SolarNetworkTeamProjectSet.psf ]; then
+		echo -e '\nCreating Eclipse team project set...'
+		cat > ~/SolarNetworkTeamProjectSet.psf <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <psf version="2.0">
 <provider id="org.eclipse.egit.core.GitProvider">
 EOF
 
-	cd ~/git
-	projects=`ls -1d */*`
-	for project in $projects; do
-		if elementIn "$project" "${skipProjects[@]}"; then
-			echo "Skipping project $project"
-		else
-			addTeamProviderRepo "$project" ~/SolarNetworkTeamProjectSet.psf
-		fi
-	done
+		cd ~/git
+		projects=`ls -1d */*`
+		for project in $projects; do
+			if elementIn "$project" "${skipProjects[@]}"; then
+				echo "Skipping project $project"
+			else
+				addTeamProviderRepo "$project" ~/SolarNetworkTeamProjectSet.psf
+			fi
+		done
 
-	cat >> ~/SolarNetworkTeamProjectSet.psf <<EOF
+		cat >> ~/SolarNetworkTeamProjectSet.psf <<EOF
 </provider>
 </psf>
 EOF
+	fi
 fi
 
 if [ -x /usr/bin/fluxbox -a ! -d ~/.fluxbox ]; then
