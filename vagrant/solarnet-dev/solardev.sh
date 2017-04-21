@@ -314,6 +314,6 @@ else
 	cat <<EOF
 
 SolarNetwork development environment setup complete. Log into the VM as
-solardev:solardev to access the Eclipse environment.
+solardev:solardev to access the development environment.
 EOF
 fi
