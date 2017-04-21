@@ -38,7 +38,11 @@ if [ -n "$DESKTOP_PACKAGES" ]; then
 fi
 
 echo -e "\nInstalling Postgres $PGVER and Java $JAVAVER..."
-sudo apt-get install -y postgresql-$PGVER postgresql-$PGVER-plv8 postgresql-contrib-$PGVER pgadmin3 git git-flow openjdk-$JAVAVER-jdk librxtx-java
+javaPkg=openjdk-$JAVAVER-jdk
+if [ -z "$DESKTOP_PACKAGES" ]; then
+	javaPkg="${javaPkg}-headless"
+fi
+sudo apt-get install -y postgresql-$PGVER postgresql-$PGVER-plv8 postgresql-contrib-$PGVER git git-flow $javaPkg librxtx-java
 
 if [ -n "$DESKTOP_PACKAGES" ]; then
 	echo -e '\nInstalling web browsers...'
