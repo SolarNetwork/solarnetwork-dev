@@ -11,6 +11,7 @@ vm_name="SolarNet Dev"
 basebox_name="ubuntu/zesty64"
 no_of_cpus=1
 memory_size=2048
+vm_gui=true
 
 postgres_version=9.6
 java_version=8
@@ -73,10 +74,8 @@ Vagrant.configure(2) do |config|
   # Example for VirtualBox:
   #
   config.vm.provider "virtualbox" do |vb|
-    # Display the VirtualBox GUI when booting the machine
-    vb.gui = true
-
-    # Customize the amount of memory on the VM:
+    # Display the VirtualBox GUI when booting the machine (set to false if not installing desktop packages)
+    vb.gui = vm_gui
 
     vb.memory = memory_size
 
@@ -101,6 +100,6 @@ Vagrant.configure(2) do |config|
   config.vm.provision :shell, path: bootstrap_path, args:
     java_version.to_s + " " +
     postgres_version.to_s + " " +
-    solarnet_host + " " +
-    desktop_packages
+    solarnet_host +
+    (vm_gui ? " " + desktop_packages : "")
 end
