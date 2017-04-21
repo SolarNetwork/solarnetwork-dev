@@ -187,6 +187,9 @@ if [ -x /usr/bin/X ]; then
 		if [ "$eclipseDownloadHash" = "$eclipseDownloadSHA512" ]; then
 			echo -e "\nInstalling Eclipse JEE ($eclipseName)..."
 			tar -C ~/ -xzf "$eclipseDownload"
+			if [ $? -eq 0 ]; then
+				rm $eclipseDownload
+			fi
 		else
 			>&2 echo "Eclipse $eclipseName not completely downloaded, cannot install."
 		fi
