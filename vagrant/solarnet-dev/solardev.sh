@@ -247,7 +247,7 @@ EOF
 EOF
 fi
 
-if [ ! -d ~/.fluxbox ]; then
+if [ -x /usr/bin/fluxbox -a ! -d ~/.fluxbox ]; then
 	mkdir ~/.fluxbox
 fi
 
