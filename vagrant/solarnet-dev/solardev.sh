@@ -7,7 +7,7 @@ if [ ! -e ~/.xinitrc -a -x /usr/bin/fluxbox ]; then
 fi
 
 # Setup X to start on console login
-if [ -x /usr/bin/fluxbox ]; then
+if [ -x /usr/bin/xinit ]; then
 	grep -q xinit ~/.bashrc
 	if [ $? -ne 0 ]; then
 		echo -e '\nConfiguring X to start on login...'
@@ -162,7 +162,7 @@ addTeamProviderRepo () {
 EOF
 }
 
-if [ -x /usr/bin/fluxbox ]; then
+if [ -x /usr/bin/X ]; then
 	eclipseDownload=/var/tmp/eclipse.tgz
 	eclipseName=Neon
 	eclipseDownloadSHA512=1fd23f05388f382c338d57727fec37e087f93baf0abd71e26ea3eda56b633fa9b042b5022fe717d578a31d5545f716ec1ba25d3945f84cbe0b7a39d335cb51b0
