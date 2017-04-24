@@ -319,8 +319,7 @@ if [ -x /usr/bin/fluxbox ]; then
 SolarNetwork development environment setup complete. Please reboot the
 virtual machine like:
 
-vagrant halt
-vagrant up
+vagrant reload
 
 Then log into the VM as solardev:solardev and Eclipse will launch
 automatically. Right-click on the desktop to access a menu of other options.
