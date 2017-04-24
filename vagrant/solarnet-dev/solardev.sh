@@ -1,28 +1,30 @@
 #!/bin/bash
 
 # Setup .xinitrc to launch Fluxbox
-if [ ! -e ~/.xinitrc ]; then
-	echo 'Configuring Fluxbox in .xinitrc...'
+if [ ! -e ~/.xinitrc -a -x /usr/bin/fluxbox ]; then
+	echo -e '\nConfiguring Fluxbox in .xinitrc...'
 	echo "exec startfluxbox" > ~/.xinitrc
 fi
 
 # Setup X to start on console login
-grep -q xinit ~/.bashrc
-if [ $? -ne 0 ]; then
-	echo 'Configuring X to start on login...'
-	cat >> ~/.bashrc <<"EOF"
+if [ -x /usr/bin/xinit ]; then
+	grep -q xinit ~/.bashrc
+	if [ $? -ne 0 ]; then
+		echo -e '\nConfiguring X to start on login...'
+		cat >> ~/.bashrc <<"EOF"
 
 if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
 	exec /usr/bin/xinit -- -nolisten tcp
 fi
 EOF
+	fi
 fi
 
 # Setup Eclipse
 # Checkout SolarNetwork sources
 for proj in build external common central node; do
 	if [ ! -d ~/git/solarnetwork-$proj ]; then
-		echo "Cloning project solarnetwork-$proj..."
+		echo -e "\nCloning project solarnetwork-$proj..."
 		mkdir -p ~/git/solarnetwork-$proj
 		git clone "https://github.com/SolarNetwork/solarnetwork-$proj.git" ~/git/solarnetwork-$proj
 		cd ~/git/solarnetwork-$proj
@@ -33,7 +35,7 @@ done
 # Setup main SolarNet database
 psql -d solarnetwork -U solarnet -c 'select count(*) from solarnet.sn_node' >/dev/null 2>&1
 if [ $? -ne 0 ]; then
-	echo 'Creating solarnet database tables...'
+	echo -e '\nCreating solarnet database tables...'
 	cd ~/git/solarnetwork-central/net.solarnetwork.central.datum/defs/sql/postgres
 	# for some reason, plv8 often chokes on the inline comments, so strip them out
 	sed -e '/^\/\*/d' -e '/^ \*/d' postgres-init-plv8.sql |sudo -u postgres psql -d solarnetwork -U postgres
@@ -43,7 +45,7 @@ fi
 # Setup unit test database
 psql -d solarnet_unittest -U solarnet_test -c 'select count(*) from solarnet.sn_node' >/dev/null 2>&1
 if [ $? -ne 0 ]; then
-	echo 'Creating solarnet_unittest database tables...'
+	echo -e '\nCreating solarnet_unittest database tables...'
 	cd ~/git/solarnetwork-central/net.solarnetwork.central.datum/defs/sql/postgres
 	# for some reason, plv8 often chokes on the inline comments, so strip them out
 	sed -e '/^\/\*/d' -e '/^ \*/d' postgres-init-plv8.sql |sudo -u postgres psql -d solarnet_unittest -U postgres
@@ -54,7 +56,7 @@ cd ~
 
 # Setup standard setup files
 if [ ! -d ~/git/solarnetwork-build/solarnetwork-osgi-target/config ]; then
-	echo 'Creating solarnetwork-build/solarnetwork-osgi-target/config files...'
+	echo -e '\nCreating solarnetwork-build/solarnetwork-osgi-target/config files...'
 	cp -a ~/git/solarnetwork-build/solarnetwork-osgi-target/example/config ~/git/solarnetwork-build/solarnetwork-osgi-target/
 
 	# Enable the SolarIn SSL connector in tomcat-server.xml
@@ -63,7 +65,7 @@ if [ ! -d ~/git/solarnetwork-build/solarnetwork-osgi-target/config ]; then
 fi
 
 if [ ! -e ~/git/solarnetwork-build/solarnetwork-osgi-target/configurations/services/net.solarnetwork.central.dao.jdbc.cfg ]; then
-	echo 'Creating JDBC configuration...'
+	echo -e '\nCreating JDBC configuration...'
 	cat > ~/git/solarnetwork-build/solarnetwork-osgi-target/configurations/services/net.solarnetwork.central.dao.jdbc.cfg <<-EOF
 		jdbc.driver = org.postgresql.Driver
 		jdbc.url = jdbc:postgresql://localhost:5432/solarnetwork
@@ -73,7 +75,7 @@ EOF
 fi
 
 if [ ! -e ~/git/solarnetwork-build/solarnetwork-osgi-target/configurations/services/net.solarnetwork.central.in.cfg ]; then
-	echo 'Creating developer SolarIn configuration...'
+	echo -e '\nCreating developer SolarIn configuration...'
 	cat > ~/git/solarnetwork-build/solarnetwork-osgi-target/configurations/services/net.solarnetwork.central.in.cfg <<-EOF
 		SimpleNetworkIdentityBiz.host = solarnetworkdev.net
 		SimpleNetworkIdentityBiz.port = 8683
@@ -82,14 +84,14 @@ EOF
 fi
 
 if [ ! -e ~/git/solarnetwork-build/solarnetwork-osgi-target/configurations/services/net.solarnetwork.central.user.biz.dao.DaoRegistrationBiz.cfg ]; then
-	echo 'Creating developer X.509 subject pattern...'
+	echo -e '\nCreating developer X.509 subject pattern...'
 	cat > ~/git/solarnetwork-build/solarnetwork-osgi-target/configurations/services/net.solarnetwork.central.user.biz.dao.DaoRegistrationBiz.cfg <<-EOF
 		networkCertificateSubjectDNFormat = UID=%s,O=SolarDev
 EOF
 fi
 
 if [ ! -d ~/git/solarnetwork-build/solarnetwork-osgi-target/conf/tls ]; then
-	echo 'Creating conf/tls directory...'
+	echo -e '\nCreating conf/tls directory...'
 	mkdir -p ~/git/solarnetwork-build/solarnetwork-osgi-target/conf/tls
 	if cd ~/git/solarnetwork-build/solarnetwork-osgi-target/conf/tls; then
 		ln -s ../../var/DeveloperCA/central.jks
@@ -106,112 +108,45 @@ EOF
 fi
 
 if [ ! -e ~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/log4j.properties ]; then
-	echo 'Creating platform logging configuration...'
+	echo -e '\nCreating platform logging configuration...'
 	cp ~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/example/log4j-dev.properties \
 		~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/log4j.properties
 fi
 
-if [ ! -e ~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/log4j.properties ]; then
-	echo 'Creating platform logging configuration...'
-	cp ~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/example/log4j.properties \
-		~/git/solarnetwork-external/net.solarnetwork.org.apache.log4j.config/log4j.properties
-fi
-
 if [ ! -e ~/git/solarnetwork-external/org.eclipse.gemini.blueprint.extender.config/META-INF/spring/extender/solarnetwork-context.xml ]; then
-	echo 'Creating Gemini Extender configuration...'
+	echo -e '\nCreating Gemini Extender configuration...'
 	cp ~/git/solarnetwork-external/org.eclipse.gemini.blueprint.extender.config/example/META-INF/spring/extender/solarnetwork-context.xml \
 		~/git/solarnetwork-external/org.eclipse.gemini.blueprint.extender.config/META-INF/spring/extender/
 fi
 
 if [ ! -e ~/git/solarnetwork-common/net.solarnetwork.common.test/environment/local/log4j.properties ]; then
-	echo 'Creating common unit test configuration...'
+	echo -e '\nCreating common unit test configuration...'
 	cp ~/git/solarnetwork-common/net.solarnetwork.common.test/environment/example/* \
 		~/git/solarnetwork-common/net.solarnetwork.common.test/environment/local/
 fi
 
 if [ ! -e ~/git/solarnetwork-central/net.solarnetwork.central.test/environment/local/log4j.properties ]; then
-	echo 'Creating SolarNet unit test configuration...'
+	echo -e '\nCreating SolarNet unit test configuration...'
 	cp ~/git/solarnetwork-central/net.solarnetwork.central.test/environment/example/* \
 		~/git/solarnetwork-central/net.solarnetwork.central.test/environment/local/
 fi
 
 if [ ! -e ~/git/solarnetwork-central/net.solarnetwork.central.user.web/web/WEB-INF/packtag.user.properties ]; then
-	echo 'Creating SolarUser pack:tag configuration...'
+	echo -e '\nCreating SolarUser pack:tag configuration...'
 	cp ~/git/solarnetwork-central/net.solarnetwork.central.user.web/example/web/WEB-INF/packtag.user.properties \
 		~/git/solarnetwork-central/net.solarnetwork.central.user.web/web/WEB-INF/packtag.user.properties
 fi
 
 if [ ! -e ~/git/solarnetwork-node/net.solarnetwork.node.test/environment/local/log4j.properties ]; then
-	echo 'Creating SolarNode unit test configuration...'
+	echo -e '\nCreating SolarNode unit test configuration...'
 	cp ~/git/solarnetwork-node/net.solarnetwork.node.test/environment/example/* \
 		~/git/solarnetwork-node/net.solarnetwork.node.test/environment/local/
 fi
 
 if [ ! -e ~/git/solarnetwork-node/net.solarnetwork.node.setup.web/web/WEB-INF/packtag.user.properties ]; then
-	echo 'Creating SolarNode pack:tag configuration...'
+	echo -e '\nCreating SolarNode pack:tag configuration...'
 	cp ~/git/solarnetwork-node/net.solarnetwork.node.setup.web/example/web/WEB-INF/packtag.user.properties \
 		~/git/solarnetwork-node/net.solarnetwork.node.setup.web/web/WEB-INF/packtag.user.properties
-fi
-
-eclipseDownload=/var/tmp/eclipse.tgz
-eclipseName=Neon
-eclipseDownloadSHA512=1fd23f05388f382c338d57727fec37e087f93baf0abd71e26ea3eda56b633fa9b042b5022fe717d578a31d5545f716ec1ba25d3945f84cbe0b7a39d335cb51b0
-eclipseDownloadHash=
-
-eclipseHashFile () {
-	echo "Verifying Eclipse download..."
-	eclipseDownloadHash=`sha512sum $eclipseDownload |cut -d' ' -f1`
-}
-
-if [ -e "$eclipseDownload" ]; then
-	eclipseHashFile
-fi
-if [ "$eclipseDownloadHash" != "$eclipseDownloadSHA512" ]; then
-	echo "Downloading Eclipse JEE ($eclipseName)..."
-	curl -C - -L -s -S -o $eclipseDownload 'http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/neon/3/eclipse-jee-neon-3-linux-gtk-x86_64.tar.gz&r=1'
-	if [ -e "$eclipseDownload" ]; then
-		eclipseHashFile
-	fi
-fi
-if [ ! -d ~/eclipse -a -e "$eclipseDownload" ]; then
-	if [ "$eclipseDownloadHash" = "$eclipseDownloadSHA512" ]; then
-		echo "Installing Eclipse JEE ($eclipseName)..."
-		tar -C ~/ -xzf "$eclipseDownload"
-	else
-		echo "Eclipse $eclipseName not completely downloaded, cannot install."
-	fi
-fi
-
-if [ ! -d  ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings ]; then
-	mkdir -p ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings
-fi
-
-# Add Git repos to Eclipse configuration
-if [ ! -e ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.egit.core.prefs ]; then
-	echo 'Configuring SolarNetwork git repositories in Eclipse...'
-	cat > ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.egit.core.prefs <<EOF
-GitRepositoriesView.GitDirectories=/home/solardev/git/solarnetwork-central/.git\:/home/solardev/git/solarnetwork-common/.git\:/home/solardev/git/solarnetwork-node/.git\:/home/solardev/git/solarnetwork-build/.git\:/home/solardev/git/solarnetwork-external/.git\:
-RepositorySearchDialogSearchPath=/home/solardev/git
-eclipse.preferences.version=1
-EOF
-fi
-
-# Add SolarNetwork target platform configuration
-if [ ! -e ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.pde.core.prefs ]; then
-	echo 'Configuring SolarNetwork Eclipse PDE target platform...'
-	cat > ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.pde.core.prefs <<EOF
-eclipse.preferences.version=1
-workspace_target_handle=resource\:/solarnetwork-osgi-target/defs/solarnetwork-gemini.target
-EOF
-fi
-
-# Add SolarNetwork debug launch configuration to Eclipse
-if [ ! -e ~/workspace/.metadata/.plugins/org.eclipse.debug.core/.launches/SolarNetwork.launch -a -e /vagrant/SolarNetwork.launch ]; then
-	echo 'Creating SolarNetwork Eclipse launch configuration...'
-	if [ ! -d ~/workspace/.metadata/.plugins/org.eclipse.debug.core/.launches ]; then
-		mkdir -p ~/workspace/.metadata/.plugins/org.eclipse.debug.core/.launches
-	fi
-	cp /vagrant/SolarNetwork.launch ~/workspace/.metadata/.plugins/org.eclipse.debug.core/.launches
 fi
 
 elementIn () {
@@ -227,45 +162,113 @@ addTeamProviderRepo () {
 EOF
 }
 
-skipProjects=("solarnetwork-build/archiva-obr-plugin" \
-	"solarnetwork-build/net.solarnetwork.pki.sun.security" \
-	"solarnetwork-central/net.solarnetwork.central.common.mail.javamail" \
-	"solarnetwork-central/net.solarnetwork.central.user.pki.dogtag" \
-	"solarnetwork-central/net.solarnetwork.central.user.pki.dogtag.test" \
-	"solarnetwork-node/net.solarnetwork.node.config" \
-	"solarnetwork-node/net.solarnetwork.node.setup.developer" \
-	"solarnetwork-node/net.solarnetwork.node.upload.mock" )
-# Generate Eclipse Team Project Set of all projects to import
-if [ ! -e ~/SolarNetworkTeamProjectSet.psf ]; then
-	cat > ~/SolarNetworkTeamProjectSet.psf <<EOF
+if [ -x /usr/bin/X ]; then
+	eclipseDownload=/var/tmp/eclipse.tgz
+	eclipseName=Neon
+	eclipseDownloadSHA512=1fd23f05388f382c338d57727fec37e087f93baf0abd71e26ea3eda56b633fa9b042b5022fe717d578a31d5545f716ec1ba25d3945f84cbe0b7a39d335cb51b0
+	eclipseDownloadHash=
+
+	eclipseHashFile () {
+		echo -e '\nVerifying Eclipse download...'
+		eclipseDownloadHash=`sha512sum $eclipseDownload |cut -d' ' -f1`
+	}
+
+	if [ -e "$eclipseDownload" ]; then
+		eclipseHashFile
+	fi
+	if [ "$eclipseDownloadHash" != "$eclipseDownloadSHA512" ]; then
+		echo -e "\nDownloading Eclipse JEE ($eclipseName)..."
+		curl -C - -L -s -S -o $eclipseDownload 'http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/neon/3/eclipse-jee-neon-3-linux-gtk-x86_64.tar.gz&r=1'
+		if [ -e "$eclipseDownload" ]; then
+			eclipseHashFile
+		fi
+	fi
+	if [ ! -d ~/eclipse -a -e "$eclipseDownload" ]; then
+		if [ "$eclipseDownloadHash" = "$eclipseDownloadSHA512" ]; then
+			echo -e "\nInstalling Eclipse JEE ($eclipseName)..."
+			tar -C ~/ -xzf "$eclipseDownload"
+			if [ $? -eq 0 ]; then
+				rm $eclipseDownload
+			fi
+		else
+			>&2 echo "Eclipse $eclipseName not completely downloaded, cannot install."
+		fi
+	fi
+
+	if [ ! -d  ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings ]; then
+		mkdir -p ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings
+	fi
+
+	# Add Git repos to Eclipse configuration
+	if [ ! -e ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.egit.core.prefs ]; then
+		echo -e '\nConfiguring SolarNetwork git repositories in Eclipse...'
+		cat > ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.egit.core.prefs <<EOF
+GitRepositoriesView.GitDirectories=/home/solardev/git/solarnetwork-central/.git\:/home/solardev/git/solarnetwork-common/.git\:/home/solardev/git/solarnetwork-node/.git\:/home/solardev/git/solarnetwork-build/.git\:/home/solardev/git/solarnetwork-external/.git\:
+RepositorySearchDialogSearchPath=/home/solardev/git
+eclipse.preferences.version=1
+EOF
+	fi
+
+	# Add SolarNetwork target platform configuration
+	if [ ! -e ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.pde.core.prefs ]; then
+		echo -e '\nConfiguring SolarNetwork Eclipse PDE target platform...'
+		cat > ~/workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.pde.core.prefs <<EOF
+eclipse.preferences.version=1
+workspace_target_handle=resource\:/solarnetwork-osgi-target/defs/solarnetwork-gemini.target
+EOF
+	fi
+
+	# Add SolarNetwork debug launch configuration to Eclipse
+	if [ ! -e ~/workspace/.metadata/.plugins/org.eclipse.debug.core/.launches/SolarNetwork.launch -a -e /vagrant/SolarNetwork.launch ]; then
+		echo -e '\nCreating SolarNetwork Eclipse launch configuration...'
+		if [ ! -d ~/workspace/.metadata/.plugins/org.eclipse.debug.core/.launches ]; then
+			mkdir -p ~/workspace/.metadata/.plugins/org.eclipse.debug.core/.launches
+		fi
+		cp /vagrant/SolarNetwork.launch ~/workspace/.metadata/.plugins/org.eclipse.debug.core/.launches
+	fi
+
+	skipProjects=("solarnetwork-build/archiva-obr-plugin" \
+		"solarnetwork-build/net.solarnetwork.pki.sun.security" \
+		"solarnetwork-central/net.solarnetwork.central.common.mail.javamail" \
+		"solarnetwork-central/net.solarnetwork.central.user.pki.dogtag" \
+		"solarnetwork-central/net.solarnetwork.central.user.pki.dogtag.test" \
+		"solarnetwork-common/net.solarnetwork.pidfile" \
+		"solarnetwork-node/net.solarnetwork.node.config" \
+		"solarnetwork-node/net.solarnetwork.node.setup.developer" \
+		"solarnetwork-node/net.solarnetwork.node.upload.mock" )
+	# Generate Eclipse Team Project Set of all projects to import
+	if [ ! -e ~/SolarNetworkTeamProjectSet.psf ]; then
+		echo -e '\nCreating Eclipse team project set...'
+		cat > ~/SolarNetworkTeamProjectSet.psf <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <psf version="2.0">
 <provider id="org.eclipse.egit.core.GitProvider">
 EOF
 
-	cd ~/git
-	projects=`ls -1d */*`
-	for project in $projects; do
-		if elementIn "$project" "${skipProjects[@]}"; then
-			echo "Skipping project $project"
-		else
-			addTeamProviderRepo "$project" ~/SolarNetworkTeamProjectSet.psf
-		fi
-	done
+		cd ~/git
+		projects=`ls -1d */*`
+		for project in $projects; do
+			if elementIn "$project" "${skipProjects[@]}"; then
+				echo "Skipping project $project"
+			else
+				addTeamProviderRepo "$project" ~/SolarNetworkTeamProjectSet.psf
+			fi
+		done
 
-	cat >> ~/SolarNetworkTeamProjectSet.psf <<EOF
+		cat >> ~/SolarNetworkTeamProjectSet.psf <<EOF
 </provider>
 </psf>
 EOF
+	fi
 fi
 
-if [ ! -d ~/.fluxbox ]; then
+if [ -x /usr/bin/fluxbox -a ! -d ~/.fluxbox ]; then
 	mkdir ~/.fluxbox
 fi
 
 # Setup Fluxbox menu
-if [ ! -e ~/.fluxbox/menu ]; then
-	echo 'Configuring Fluxbox menu...'
+if [ -x /usr/bin/fluxbox -a ! -e ~/.fluxbox/menu ]; then
+	echo -e '\nConfiguring Fluxbox menu...'
 	cat > ~/.fluxbox/menu <<EOF
 [begin] (SolarNetwork Dev)
         [exec] (Eclipse) { ~/eclipse/eclipse -data ~/workspace } <~/eclipse/icon.xpm>
@@ -285,8 +288,8 @@ EOF
 fi
 
 # Set Eclipse to launch on Fluxbox startup
-if [ -x ~/eclipse/eclipse -a ! -e ~/.fluxbox/startup ]; then
-	echo 'Configuring Eclipse to start on login...'
+if [ -x ~/eclipse/eclipse -a -x /usr/bin/fluxbox -a ! -e ~/.fluxbox/startup ]; then
+	echo -e '\nConfiguring Eclipse to start on login...'
 	cat > ~/.fluxbox/startup <<EOF
 #!/bin/sh
 
@@ -310,18 +313,8 @@ exec fluxbox
 EOF
 fi
 
-# Install EGit
-# ls -1d ~/eclipse/features/org.eclipse.egit* >/dev/null 2>&1
-# if [ $? -ne 0 -a -x ~/eclipse/eclipse ]; then
-# 	echo 'Installing EGit...'
-# 	~/eclipse/eclipse -application org.eclipse.equinox.p2.director \
-# 		-repository http://download.eclipse.org/releases/luna \
-# 		-installIU org.eclipse.egit.feature.group \
-# 		-tag AddEGit \
-# 		-destination ~/eclipse/ -profile SDKProfile
-# fi
-
-cat <<EOF
+if [ -x /usr/bin/fluxbox ]; then
+	cat <<"EOF"
 
 SolarNetwork development environment setup complete. Please reboot the
 virtual machine like:
@@ -335,3 +328,10 @@ automatically. Right-click on the desktop to access a menu of other options.
 NOTE: If X fails to start via tty1, login on tty2 and run `startx` to
 start X and have Eclipse launch automatically.
 EOF
+else
+	cat <<EOF
+
+SolarNetwork development environment setup complete. Log into the VM as
+solardev:solardev to access the development environment.
+EOF
+fi
