@@ -24,4 +24,15 @@ to launch the display environment and Eclipse.
 For more information, see the [Developer Virtual Machine Guide][vm-guide] on
 the SolarNetwork wiki.
 
+## Non GUI environment
+
+You can provision a headless VM without any GUI, which can be useful as a
+database host for an existing Eclipse environment. To do this, create a
+`Vagrantfile.local` file with the following content:
+
+```ruby
+# Disable installing X, Eclipse, etc.
+vm_gui=false
+```
+
   [vm-guide]: https://github.com/SolarNetwork/solarnetwork/wiki/Developer-VM
