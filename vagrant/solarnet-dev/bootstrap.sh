@@ -5,6 +5,9 @@ PGVER=$2
 HOST=$3
 DESKTOP_PACKAGES=${@:4}
 
+GIT_HOME="/home/solardev/git"
+WORKSPACE="/home/solardev/workspace"
+
 grep -q $HOST /etc/hosts
 if [ $? -ne 0 ]; then
 	echo "Setting up $HOST host"
@@ -127,6 +130,63 @@ if [ ! -e /etc/sudoers.d/solardev -a -e /vagrant/solardev.sudoers ]; then
 	sudo chmod 644 /etc/sudoers.d/solardev
 fi
 
+# Check out the source code
+if [[ -x /vagrant/bin/solardev-git.sh ]]; then
+	sudo -i -u solardev /vagrant/bin/solardev-git.sh $GIT_HOME
+fi
+
+# Configure the linux installation
 if [ -x /vagrant/solardev.sh ]; then
-	sudo -i -u solardev /vagrant/solardev.sh
+	sudo -i -u solardev /vagrant/solardev.sh $WORKSPACE $GIT_HOME
+fi
+
+# Set up the eclipse workspace
+if [[ -x /vagrant/bin/solardev-workspace.sh && -x /usr/bin/X ]]; then
+	sudo -i -u solardev /vagrant/bin/solardev-workspace.sh $WORKSPACE $GIT_HOME
+fi
+
+# Success messages
+if [ -x /usr/bin/fluxbox ]; then
+	cat <<"EOF"
+
+--------------------------------------------------------------------------------
+SolarNetwork development environment setup complete. Please reboot the
+virtual machine like:
+
+vagrant reload
+
+Then log into the VM as solardev:solardev and Eclipse will launch
+automatically. Right-click on the desktop to access a menu of other options.
+
+NOTE: If X fails to start via tty1, login on tty2 and run `startx` to
+start X and have Eclipse launch automatically.
+EOF
+elif [[ "$DESKTOP_PACKAGES" == *"virtualbox-guest-dkms"*  ]]; then
+  # if virtualbox-guest-dkms is included reconfigure so that the desktop will scale when resized
+  echo -e "\nReconfiguring virtualbox-guest-dkms\n"
+  sudo dpkg-reconfigure virtualbox-guest-dkms
+
+  cat <<EOF
+
+--------------------------------------------------------------------------------
+SolarNetwork development environment setup complete, rebooting VM.
+
+Once restarted log into the VM as solardev:solardev.
+
+NOTE: If the desktop fails to auto scale first try rebooting the VM,
+if that doesn't work manually run : "sudo dpkg-reconfigure virtualbox-guest-dkms"
+then restart the VM.
+EOF
+
+  # Restart the VM to show the desktop
+  sudo reboot
+
+else
+  cat <<EOF
+
+--------------------------------------------------------------------------------
+SolarNetwork development environment setup complete.
+
+Log into the VM as solardev:solardev.
+EOF
 fi
