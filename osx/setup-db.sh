@@ -24,12 +24,14 @@ psql -U postgres -d postgres -c "alter user solarnet with password 'solarnet';"
 createdb -E UNICODE -l C -T template0 -O solarnet solarnetwork
 createlang plv8 solarnetwork
 psql -U postgres -d solarnetwork -c "CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public;"
+psql -U postgres -d solarnetwork -c "CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;"
 
 createuser -AD solarnet_test
 psql -U postgres -d postgres -c "alter user solarnet_test with password 'solarnet_test';"
 createdb -E UNICODE -l C -T template0 -O solarnet_test solarnet_unittest
 createlang plv8 solarnet_unittest
 psql -U postgres -d solarnet_unittest -c "CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public;"
+psql -U postgres -d solarnet_unittest -c "CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;"
 
 # Setup base database
 cd $WORKSPACE/solarnetwork-central/net.solarnetwork.central.datum/defs/sql/postgres
@@ -37,7 +39,8 @@ cd $WORKSPACE/solarnetwork-central/net.solarnetwork.central.datum/defs/sql/postg
 # for some reason, plv8 often chokes on the inline comments, so strip them out
 sed -e '/^\/\*/d' -e '/^ \*/d' postgres-init-plv8.sql | psql -d solarnetwork -U postgres
 psql -d solarnetwork -U solarnet -f postgres-init.sql
-psql -d solarnetwork -U solarnet -f postgres-init-data.sql
+# Loading of initial data via postgres-init-data.sql is not currently supported
+# psql -d solarnetwork -U solarnet -f postgres-init-data.sql
 
 # for some reason, plv8 often chokes on the inline comments, so strip them out
 sed -e '/^\/\*/d' -e '/^ \*/d' postgres-init-plv8.sql | psql -d solarnet_unittest -U postgres

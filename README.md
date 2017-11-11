@@ -3,6 +3,12 @@ Development support for SolarNetwork:
 * natively on OSX
 * using a VM on Linux, OSX or Windows
 
+Folder structure:
+- ./bin - shared installation scripts
+- ./eclipse - eclipse configuration files
+- ./osx - Mac OSX installation scripts
+- ./vagrant - Vagrant VM configurations
+
 For full documentation refer to the [Developer Guide]( https://github.com/SolarNetwork/solarnetwork/wiki/Developer-Guide).
 ___
 

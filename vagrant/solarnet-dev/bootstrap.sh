@@ -112,6 +112,7 @@ if [ $? -ne 0 ]; then
 	sudo -u postgres createdb -E UNICODE -l C -T template0 -O solarnet solarnetwork
 	sudo -u postgres createlang plv8 solarnetwork
 	sudo -u postgres psql -U postgres -d solarnetwork -c "CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public;"
+	sudo -u postgres psql -U postgres -d solarnetwork -c "CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;"
 fi
 
 sudo -u postgres sh -c "psql -d solarnet_unittest -c 'SELECT now()'" >/dev/null 2>&1
@@ -122,6 +123,7 @@ if [ $? -ne 0 ]; then
 	sudo -u postgres createdb -E UNICODE -l C -T template0 -O solarnet_test solarnet_unittest
 	sudo -u postgres createlang plv8 solarnet_unittest
 	sudo -u postgres psql -U postgres -d solarnet_unittest -c "CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public;"
+	sudo -u postgres psql -U postgres -d solarnet_unittest -c "CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;"
 fi
 
 if [ ! -e /etc/sudoers.d/solardev -a -e /vagrant/solardev.sudoers ]; then
