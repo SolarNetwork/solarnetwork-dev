@@ -89,7 +89,8 @@ skipProjects=("solarnetwork-build/archiva-obr-plugin" \
   "solarnetwork-common/net.solarnetwork.pidfile" \
   "solarnetwork-node/net.solarnetwork.node.config" \
   "solarnetwork-node/net.solarnetwork.node.setup.developer" \
-  "solarnetwork-node/net.solarnetwork.node.upload.mock" )
+  "solarnetwork-node/net.solarnetwork.node.upload.mock" \
+  "solarnetwork-node/net.solarnetwork.node.system.ssh" )
 # Generate Eclipse Team Project Set of all projects to import
 if [ ! -e $WORKSPACE/SolarNetworkTeamProjectSet.psf ]; then
   echo -e '\nCreating Eclipse team project set...'
