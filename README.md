@@ -50,16 +50,16 @@ e.g.
 
 The default installation uses a minimal fluxbox desktop environment and limited system resources. These can be overridden using by creating a file named `Vagrantfile.local` along side the default `Vagrantfile` which allows the following setting to be overridden:
 
-| Name | Value |
-|------|-------|
-|vm_define|the unique ID that identifies the VM that is generated|
-|vm_name|the user friendly name of the VM|
-|basebox_name|the name/id of the vagrant base box to create the VM from|
-|no_of_cpus|the number of virtual CPUs|
-|memory_size|the memory to assign to the VM|
-|postgres_version|the version of PostgreSQL to install|
-|java_version|the version of java to install|
-|desktop_packages|can be used to override fluxbox as the desktop|
+| Name | Default | Description |
+|------|---------|-------------|
+|vm_define|solarnet|the unique ID that identifies the VM that is generated|
+|vm_name|SolarNet Dev|the user friendly name of the VM|
+|basebox_name|ubuntu/zesty64|the name/id of the vagrant base box to create the VM from|
+|no_of_cpus|1|the number of virtual CPUs|
+|memory_size|2048|the memory to assign to the VM|
+|postgres_version|9.6|the version of PostgreSQL to install|
+|java_version|8|the version of java to install|
+|desktop_packages|xorg xserver-xorg-legacy fluxbox virtualbox-guest-dkms pgadmin3|can be used to override fluxbox as the desktop|
 
 Examples for the desktop_packages variable include:
 * virtualbox-guest-dkms virtualbox-guest-additions-iso virtualbox-guest-utils ubuntu-desktop --no-install-recommends
