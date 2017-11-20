@@ -57,7 +57,7 @@ The default installation uses a minimal fluxbox desktop environment and limited 
 |basebox_name|the name/id of the vagrant base box to create the VM from|
 |no_of_cpus|the number of virtual CPUs|
 |memory_size|the memory to assign to the VM|
-|postgre_version|the version of PostgreSQL to install|
+|postgres_version|the version of PostgreSQL to install|
 |java_version|the version of java to install|
 |desktop_packages|can be used to override fluxbox as the desktop|
 
