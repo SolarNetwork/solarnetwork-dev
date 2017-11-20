@@ -12,8 +12,8 @@ if [ -z "$WORKSPACE" ]; then
   exit 1
 fi
 
-../bin/solardev-git.sh $WORKSPACE
+./solardev-git.sh $WORKSPACE
 cd .
-../bin/solardev-workspace.sh $WORKSPACE
+./solardev-workspace.sh $WORKSPACE
 cd .
-./setup-db.sh $WORKSPACE
+./solardev-db.sh $WORKSPACE

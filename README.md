@@ -4,9 +4,8 @@ Development support for SolarNetwork:
 * using a VM on Linux, OSX or Windows
 
 Folder structure:
-- ./bin - shared installation scripts
+- ./bin - common installation scripts
 - ./eclipse - eclipse configuration files
-- ./osx - Mac OSX installation scripts
 - ./vagrant - Vagrant VM configurations
 
 For full documentation refer to the [Developer Guide]( https://github.com/SolarNetwork/solarnetwork/wiki/Developer-Guide).
@@ -24,13 +23,13 @@ Requirements:
 * [Eclipse](http://www.eclipse.org/downloads/)
 * [PostgreSQL](https://www.postgresql.org/download/macosx/)
 
-From the command line go into `osx` directory and run the `./setup.sh` script to:
+From the command line go into `bin` directory and run the `./setup.sh` script to:
 * checkout the git repositories
 * setup the eclipse workspace
 * set up the PostgreSQL database
 
 e.g.
-`cd ~/solarnet-dev/osx`
+`cd ~/solarnet-dev/bin`
 `./setup.sh ~/solarnet-workspace`
 
 ___
