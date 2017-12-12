@@ -34,7 +34,7 @@ psql -U postgres -d solarnet_unittest -c "CREATE EXTENSION IF NOT EXISTS citext 
 psql -U postgres -d solarnet_unittest -c "CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;"
 
 # Setup base database
-cd $WORKSPACE/solarnetwork-central/net.solarnetwork.central.datum/defs/sql/postgres
+cd $WORKSPACE/solarnetwork-central/solarnet-db-setup/postgres
 
 # for some reason, plv8 often chokes on the inline comments, so strip them out
 sed -e '/^\/\*/d' -e '/^ \*/d' postgres-init-plv8.sql | psql -d solarnetwork -U postgres
