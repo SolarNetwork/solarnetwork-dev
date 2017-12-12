@@ -59,6 +59,7 @@ The default installation uses a minimal fluxbox desktop environment and limited 
 |memory_size|2048|the memory to assign to the VM|
 |postgres_version|9.6|the version of PostgreSQL to install|
 |java_version|8|the version of java to install|
+|git_branch|develop|the git branch to checkout|
 |desktop_packages|xorg xserver-xorg-legacy fluxbox virtualbox-guest-dkms pgadmin3|can be used to override fluxbox as the desktop|
 
 Examples for the desktop_packages variable include:

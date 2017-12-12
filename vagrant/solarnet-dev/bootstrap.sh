@@ -3,7 +3,8 @@
 JAVAVER=$1
 PGVER=$2
 HOST=$3
-DESKTOP_PACKAGES=${@:4}
+GIT_BRANCH=$4
+DESKTOP_PACKAGES=${@:5}
 
 GIT_HOME="/home/solardev/git"
 WORKSPACE="/home/solardev/workspace"
@@ -143,8 +144,8 @@ if [ ! -e /etc/sudoers.d/solardev -a -e /vagrant/solardev.sudoers ]; then
 fi
 
 # Check out the source code
-if [[ -x /vagrant/bin/solardev-git.sh ]]; then
-	sudo -i -u solardev /vagrant/bin/solardev-git.sh $GIT_HOME
+if [ -x /vagrant/bin/solardev-git.sh ]; then
+	sudo -i -u solardev /vagrant/bin/solardev-git.sh $GIT_HOME $GIT_BRANCH
 fi
 
 # Configure the linux installation
@@ -153,7 +154,7 @@ if [ -x /vagrant/solardev.sh ]; then
 fi
 
 # Set up the eclipse workspace
-if [[ -x /vagrant/bin/solardev-workspace.sh && -x /usr/bin/X ]]; then
+if [ -x /vagrant/bin/solardev-workspace.sh -a -x /usr/bin/X ]; then
 	sudo -i -u solardev /vagrant/bin/solardev-workspace.sh $WORKSPACE $GIT_HOME
 fi
 

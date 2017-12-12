@@ -4,11 +4,12 @@
 # Usage: ./solardev-git.sh <checkout directory>
 
 GIT_HOME=$1
-# TODO make branch configurable
+GIT_BRANCH=${2:-develop}
+GIT_BRANCH_FALLBACK=develop
 
 # Make sure that a workspace has been specified
 if [ -z "$GIT_HOME" ]; then
-  echo "Usage: ./solardev-git.sh <checkout directory>"
+  echo "Usage: ./solardev-git.sh <checkout directory> [<branch>]"
   exit 1
 fi
 
@@ -16,7 +17,7 @@ if [ ! -d $GIT_HOME ]; then
   mkdir -p $GIT_HOME
 fi
 
-echo "Checking out SolarNetwork sources to: $GIT_HOME"
+echo "Checking out SolarNetwork branch $GIT_BRANCH sources to: $GIT_HOME"
 
 # Setup Eclipse
 # Checkout SolarNetwork sources
@@ -27,7 +28,14 @@ for proj in build external common central node dras; do
 		mkdir -p $GIT_HOME/solarnetwork-$proj
 		git clone "https://github.com/SolarNetwork/solarnetwork-$proj.git" $GIT_HOME/solarnetwork-$proj
 		cd $GIT_HOME/solarnetwork-$proj
-		git checkout -b develop origin/develop
+
+		# See if requested branch exists, and if so use that, otherwise use fallback branch
+		if [ -z "$(git branch --list -a origin/$GIT_BRANCH)" ]; then
+			echo -e "\nRemote branch [$GIT_BRANCH] not found in project [$proj], falling back to branch [$GIT_BRANCH_FALLBACK]"
+			git checkout -b $GIT_BRANCH_FALLBACK origin/$GIT_BRANCH_FALLBACK
+		else
+			git checkout -b $GIT_BRANCH origin/$GIT_BRANCH
+		fi
 	fi
 done
 
