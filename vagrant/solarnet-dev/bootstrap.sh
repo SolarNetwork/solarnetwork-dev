@@ -8,9 +8,9 @@ DESKTOP_PACKAGES=${@:4}
 GIT_HOME="/home/solardev/git"
 WORKSPACE="/home/solardev/workspace"
 
-grep -q $HOST /etc/hosts
+grep -q $HOST /etc/hostname
 if [ $? -ne 0 ]; then
-	echo "Setting up $HOST host"
+	echo "Setting up $HOST hostname"
 	echo $HOST >>/tmp/hostname.new
 	chmod 644 /tmp/hostname.new
 	sudo chown root:root /tmp/hostname.new
@@ -18,12 +18,22 @@ if [ $? -ne 0 ]; then
 	sudo mv -f /tmp/hostname.new /etc/hostname
 
 	sudo hostname $HOST
+fi
 
+grep -q $HOST /etc/hosts
+if [ $? -ne 0 ]; then
+	echo "Setting up $HOST host entry"
 	sed "s/^127.0.0.1[[:space:]]*localhost/127.0.0.1 $HOST localhost/" /etc/hosts >/tmp/hosts.new
-	chmod 644 /tmp/hosts.new
-	sudo chown root:root /tmp/hosts.new
-	sudo cp -a /etc/hosts /etc/hosts.bak
-	sudo mv -f /tmp/hosts.new /etc/hosts
+	if [ -z "$(diff /etc/hosts /tmp/hosts.new)" ]; then
+		# didn't change anything, try 127.0.1.0
+		sed "s/^127.0.1.1.*/127.0.1.1 $HOST/" /etc/hosts >/tmp/hosts.new
+	fi
+	if [ "$(diff /etc/hosts /tmp/hosts.new)" ]; then
+		chmod 644 /tmp/hosts.new
+		sudo chown root:root /tmp/hosts.new
+		sudo cp -a /etc/hosts /etc/hosts.bak
+		sudo mv -f /tmp/hosts.new /etc/hosts
+	fi
 fi
 
 grep -q '/swapfile' /etc/fstab
