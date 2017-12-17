@@ -37,7 +37,7 @@ fi
 psql -d solarnetwork -U solarnet -c 'select count(*) from solarnet.sn_node' >/dev/null 2>&1
 if [ $? -ne 0 ]; then
 	echo -e '\nCreating solarnet database tables...'
-	cd $GIT_HOME/solarnetwork-central/net.solarnetwork.central.datum/defs/sql/postgres
+	cd $GIT_HOME/solarnetwork-central/solarnet-db-setup/postgres
 	# for some reason, plv8 often chokes on the inline comments, so strip them out
 	sed -e '/^\/\*/d' -e '/^ \*/d' postgres-init-plv8.sql |sudo -u postgres psql -d solarnetwork -U postgres
 	psql -d solarnetwork -U solarnet -f postgres-init.sql
@@ -47,7 +47,7 @@ fi
 psql -d solarnet_unittest -U solarnet_test -c 'select count(*) from solarnet.sn_node' >/dev/null 2>&1
 if [ $? -ne 0 ]; then
 	echo -e '\nCreating solarnet_unittest database tables...'
-	cd $GIT_HOME/solarnetwork-central/net.solarnetwork.central.datum/defs/sql/postgres
+	cd $GIT_HOME/solarnetwork-central/solarnet-db-setup/postgres
 	# for some reason, plv8 often chokes on the inline comments, so strip them out
 	sed -e '/^\/\*/d' -e '/^ \*/d' postgres-init-plv8.sql |sudo -u postgres psql -d solarnet_unittest -U postgres
 	psql -d solarnet_unittest -U solarnet_test -f postgres-init.sql
@@ -55,8 +55,9 @@ fi
 
 if [ -x /usr/bin/X ]; then
 	eclipseDownload=/var/tmp/eclipse.tgz
-	eclipseName=Neon
-	eclipseDownloadSHA512=1fd23f05388f382c338d57727fec37e087f93baf0abd71e26ea3eda56b633fa9b042b5022fe717d578a31d5545f716ec1ba25d3945f84cbe0b7a39d335cb51b0
+	eclipseName=Oxygen
+	eclipseDownloadURL='http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/oxygen/1a/eclipse-jee-oxygen-1a-linux-gtk-x86_64.tar.gz&r=1'
+	eclipseDownloadSHA512=06e66ea61fcc156f71064c3461038ba92781484747c9c56844d8e6a88e575308fd56b3bdda216ac30de0476c3f4dbf90e0422cbcd3591711387e6743b4c52f18
 	eclipseDownloadHash=
 
 	eclipseHashFile () {
@@ -67,9 +68,10 @@ if [ -x /usr/bin/X ]; then
 	if [ -e "$eclipseDownload" ]; then
 		eclipseHashFile
 	fi
+
 	if [ "$eclipseDownloadHash" != "$eclipseDownloadSHA512" ]; then
 		echo -e "\nDownloading Eclipse JEE ($eclipseName)..."
-		curl -C - -L -s -S -o $eclipseDownload 'http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/neon/3/eclipse-jee-neon-3-linux-gtk-x86_64.tar.gz&r=1'
+		curl -C - -L -s -S -o $eclipseDownload $eclipseDownloadURL
 		if [ -e "$eclipseDownload" ]; then
 			eclipseHashFile
 		fi
