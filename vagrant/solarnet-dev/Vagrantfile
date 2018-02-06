@@ -8,7 +8,7 @@
 vm_define="solarnet"
 bootstrap_path="bootstrap.sh"
 vm_name="SolarNet Dev"
-basebox_name="ubuntu/zesty64"
+basebox_name="ubuntu/artful64"
 no_of_cpus=1
 memory_size=2048
 vm_gui=true
