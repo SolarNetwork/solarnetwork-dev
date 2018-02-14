@@ -9,6 +9,9 @@ DESKTOP_PACKAGES=${@:5}
 GIT_HOME="/home/solardev/git"
 WORKSPACE="/home/solardev/workspace"
 
+# Expand root
+sudo resize2fs /dev/sda1
+
 grep -q $HOST /etc/hostname
 if [ $? -ne 0 ]; then
 	echo "Setting up $HOST hostname"
