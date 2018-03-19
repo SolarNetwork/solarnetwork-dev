@@ -99,8 +99,8 @@ if [ ! -e "$JDT_UI_PREFS" ]; then
   touch $JDT_UI_PREFS
 fi
 echo -e '\nUpdating SolarNetwork Eclipse code templates and formatting rules...'
-code_templates="`getXmlPropertyFromFile $GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/defs/solarnetwork-codetemplates.xml`"
-formatterprofiles="`getXmlPropertyFromFile $GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/defs/solarnetwork-codeformat.xml`"
+code_templates=$(getXmlPropertyFromFile $GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/defs/solarnetwork-codetemplates.xml)
+formatterprofiles=$(getXmlPropertyFromFile $GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/defs/solarnetwork-codeformat.xml)
 
 setProperty "formatter_profile" "_SolarNetwork" "$JDT_UI_PREFS"
 setProperty "org.eclipse.jdt.ui.text.code_templates_migrated" "true" "$JDT_UI_PREFS"
