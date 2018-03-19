@@ -141,6 +141,16 @@ EOF
 skipProjects=("solarnetwork-build/archiva-obr-plugin" \
   "solarnetwork-build/net.solarnetwork.pki.sun.security" \
   "solarnetwork-central/net.solarnetwork.central.common.mail.javamail" \
+  "solarnetwork-central/net.solarnetwork.central.user.billing.aop" \
+  "solarnetwork-central/net.solarnetwork.central.user.billing.biz.dao" \
+  "solarnetwork-central/net.solarnetwork.central.user.billing.biz.dao.test" \
+  "solarnetwork-central/net.solarnetwork.central.user.billing.killbill" \
+  "solarnetwork-central/net.solarnetwork.central.user.billing.killbill.jobs" \
+  "solarnetwork-central/net.solarnetwork.central.user.billing.killbill.jobs.test" \
+  "solarnetwork-central/net.solarnetwork.central.user.billing.killbill.test" \
+  "solarnetwork-central/net.solarnetwork.central.user.nim" \
+  "solarnetwork-central/net.solarnetwork.central.user.nim.cloud" \
+  "solarnetwork-central/net.solarnetwork.central.user.nim.jobs" \
   "solarnetwork-central/net.solarnetwork.central.user.pki.dogtag" \
   "solarnetwork-central/net.solarnetwork.central.user.pki.dogtag.test" \
   "solarnetwork-common/net.solarnetwork.pidfile" \
