@@ -68,6 +68,11 @@ fi
 
 # Install SolarNetwork code templates and formatting rules
 setProperty(){
+	# make sure the file exists
+	if [ ! -e $3 ]; then
+		touch $3
+	fi
+
   # expects: property name, value, file path
   if grep -q "^$1=" "$3"; then
     # Update the existing property
