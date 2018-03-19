@@ -148,7 +148,6 @@ skipProjects=("solarnetwork-build/archiva-obr-plugin" \
   "solarnetwork-central/net.solarnetwork.central.user.billing.killbill.jobs" \
   "solarnetwork-central/net.solarnetwork.central.user.billing.killbill.jobs.test" \
   "solarnetwork-central/net.solarnetwork.central.user.billing.killbill.test" \
-  "solarnetwork-central/net.solarnetwork.central.user.nim" \
   "solarnetwork-central/net.solarnetwork.central.user.nim.cloud" \
   "solarnetwork-central/net.solarnetwork.central.user.nim.jobs" \
   "solarnetwork-central/net.solarnetwork.central.user.pki.dogtag" \
