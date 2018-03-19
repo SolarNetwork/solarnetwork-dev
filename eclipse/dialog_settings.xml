@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="SourceActionDialog.methods">
+		<item value="true" key="IgnoreDefault"/>
+		<item value="false" key="SynchronizedModifier"/>
+		<item value="true" key="Comments"/>
+		<item value="1" key="InsertPosition.v2"/>
+		<item value="0" key="StringStyle"/>
+		<item value="1" key="ToStringTemplateSelected"/>
+		<item value="false" key="LimitElements"/>
+		<item value="false" key="SkipNull"/>
+		<item value="10" key="LimitValue"/>
+		<item value="false" key="FinalModifier"/>
+		<list key="ToStringTemplates">
+			<item value="${object.className} [${member.name()}=${member.value}, ${otherMembers}]"/>
+			<item value="${object.className}{${member.name()}=${member.value}, ${otherMembers}}"/>
+		</list>
+		<list key="ToStringTemplateNames">
+			<item value="&lt;Default template&gt;"/>
+			<item value="SolarNetwork"/>
+		</list>
+	</section>
+	<section name="quick_assist_proposal_size">
+	</section>
+	<section name="completion_proposal_size">
+	</section>
+	<section name="DialogBounds_GenerateToStringDialog">
+		<item value="504" key="DIALOG_WIDTH"/>
+		<item value="1|.AppleSystemUIFont|11.0|0|COCOA|1|.AppleSystemUIFont" key="DIALOG_FONT_NAME"/>
+		<item value="641" key="DIALOG_HEIGHT"/>
+		<item value="708" key="DIALOG_X_ORIGIN"/>
+		<item value="101" key="DIALOG_Y_ORIGIN"/>
+	</section>
+	<section name="JavaElementSearchActions">
+	</section>
+</section>

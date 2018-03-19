@@ -30,6 +30,12 @@ if [ -e /vagrant/eclipse/SolarNetwork.launch ]; then
 fi
 echo "Launch file: $LAUNCH_FILE"
 
+ECLIPSE_DIALOG_FILE="../eclipse/dialog_settings.xml"
+if [ -e /vagrant/eclipse/dialog_settings.xml ]; then
+  # Use the vagrant location when in that context
+  ECLIPSE_DIALOG_FILE="/vagrant/eclipse/dialog_settings.xml"
+fi
+
 # Setup Eclipse
 if [ ! -d  $WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings ]; then
   mkdir -p $WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings
@@ -68,6 +74,11 @@ fi
 
 # Install SolarNetwork code templates and formatting rules
 setProperty(){
+	# make sure the file exists
+	if [ ! -e $3 ]; then
+		touch $3
+	fi
+
   # expects: property name, value, file path
   if grep -q "^$1=" "$3"; then
     # Update the existing property
@@ -106,6 +117,15 @@ setProperty "sp_cleanup.add_missing_annotations" "true" "$WORKSPACE/.metadata/.p
 setProperty "sp_cleanup.add_missing_override_annotations" "true" "$WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.jdt.ui.prefs"
 setProperty "sp_cleanup.add_missing_override_annotations_interface_methods" "true" "$WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.jdt.ui.prefs"
 setProperty "sp_cleanup.add_missing_deprecated_annotations" "true" "$WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.jdt.ui.prefs"
+
+# Copy the eclipse dialog settings, these include the toString template used in SolarNetwork
+if [ -e $ECLIPSE_DIALOG_FILE ]; then
+	if [ ! -e $WORKSPACE/.metadata/.plugins/org.eclipse.jdt.ui ]; then
+		mkdir -p $WORKSPACE/.metadata/.plugins/org.eclipse.jdt.ui;
+	fi
+	echo "Copying $ECLIPSE_DIALOG_FILE into workspace"
+	cp $ECLIPSE_DIALOG_FILE $WORKSPACE/.metadata/.plugins/org.eclipse.jdt.ui/
+fi
 
 # Configure the eclipse workspace projects
 
