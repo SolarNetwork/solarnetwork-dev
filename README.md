@@ -62,7 +62,10 @@ The default installation uses a minimal fluxbox desktop environment and limited 
 |postgres_version|9.6|the version of PostgreSQL to install|
 |java_version|8|the version of java to install|
 |git_branch|develop|the git branch to checkout|
+|git_repos|build external common central node|the SolarNetwork repos to checkout|
 |desktop_packages|xorg xserver-xorg-legacy fluxbox virtualbox-guest-dkms pgadmin3|can be used to override fluxbox as the desktop|
+
+You can change `git_repos` to include SolarDRAS by adding ` dras` to the default value.
 
 Examples for the desktop_packages variable include:
 * virtualbox-guest-dkms virtualbox-guest-additions-iso virtualbox-guest-utils ubuntu-desktop --no-install-recommends

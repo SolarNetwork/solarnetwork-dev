@@ -14,6 +14,7 @@ memory_size=2048
 vm_gui=true
 
 git_branch="develop"
+git_repos="build external common central node"
 postgres_version=9.6
 java_version=8
 
@@ -109,10 +110,12 @@ Vagrant.configure(2) do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
-  config.vm.provision :shell, path: bootstrap_path, args:
-    java_version.to_s + " " +
-    postgres_version.to_s + " " +
-    solarnet_host + " " +
-    git_branch +
-    (vm_gui ? " " + desktop_packages : "")
+  config.vm.provision :shell, path: bootstrap_path, :args => [
+      java_version.to_s,
+      postgres_version.to_s,
+      solarnet_host,
+      git_branch,
+      git_repos,
+      (vm_gui ? desktop_packages : "")
+    ]
 end

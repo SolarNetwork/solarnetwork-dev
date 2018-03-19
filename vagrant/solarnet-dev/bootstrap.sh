@@ -4,7 +4,8 @@ JAVAVER=$1
 PGVER=$2
 HOST=$3
 GIT_BRANCH=$4
-DESKTOP_PACKAGES=${@:5}
+GIT_REPOS=$5
+DESKTOP_PACKAGES=$6
 
 GIT_HOME="/home/solardev/git"
 WORKSPACE="/home/solardev/workspace"
@@ -148,7 +149,7 @@ fi
 
 # Check out the source code
 if [ -x /vagrant/bin/solardev-git.sh ]; then
-	sudo -i -u solardev /vagrant/bin/solardev-git.sh $GIT_HOME $GIT_BRANCH
+	sudo -i -u solardev /vagrant/bin/solardev-git.sh $GIT_HOME $GIT_BRANCH "$GIT_REPOS"
 fi
 
 # Configure the linux installation
