@@ -81,7 +81,7 @@ setProperty () {
   # expects: property name, value, file path
   if grep -q "^$1=" "$3"; then
     # Update the existing property
-    awk -v pat="^$1=" -v value="`echo "$1=$2"  | sed -e 's/=/\\=/g' -e 's/\\n/\\\\n/g'`" '{ if ($0 ~ pat) print value; else print $0; }' $3 > $3.tmp
+    awk -v "pat=^$1=" -v "key=$1" -v "repl=$2" '{ if ($0 ~ pat) printf("%s=%s\n", key, repl); else print $0; }' $3 >$3.tmp
     mv $3.tmp $3
   else
     # Append as a new property
@@ -91,7 +91,7 @@ setProperty () {
 
 getXmlPropertyFromFile () {
   # expects: file path
-  sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\\\\n/g' -e 's/=/\\=/g' $1
+  sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\\\\n/g' -e 's/=/\\\\=/g' $1
 }
 
 JDT_UI_PREFS="$WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.jdt.ui.prefs"
