@@ -89,7 +89,7 @@ fi
 getent passwd solardev >/dev/null
 if [ $? -ne 0 ]; then
 	echo -e '\nAdding solardev user.'
-	sudo useradd -c 'SolarNet Developer' -m -U solardev
+	sudo useradd -c 'SolarNet Developer' -s /bin/bash -m -U solardev
 	sudo sh -c 'echo "solardev:solardev" |chpasswd'
 fi
 
