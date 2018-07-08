@@ -72,4 +72,22 @@ Examples for the desktop_packages variable include:
 * virtualbox-guest-dkms virtualbox-guest-additions-iso virtualbox-guest-utils xubuntu-desktop --no-install-recommends
 * virtualbox-guest-dkms virtualbox-guest-additions-iso lubuntu-desktop
 
-To adjust the screen size of the VM, refer to the [screen resolution section of the setup guide](https://github.com/SolarNetwork/solarnetwork/wiki/Developer-VM#prepare-screen-resolution).
+An example `Vagrantfile.local` file looks like this:
+
+```
+vm_define = "solarnet-bionic"
+vm_name = "SolarNet Bionic"
+basebox_name = "ubuntu/bionic64"
+postgres_version = 10
+```
+
+### OS customization
+
+You can create a `local-root` folder next to the `Vagrantfile` and place any files you'd
+like to copy into the VM. They will be copied as the `root` user and folders will be preserved.
+
+For example, you can adjust the screen size of the VM by creating a
+`local-root/etc/X11/xorg.conf.d/10-monitor.conf` file as outlined in the [screen resolution
+section of the setup guide][screen-res].
+
+ [screen-res]: https://github.com/SolarNetwork/solarnetwork/wiki/Developer-VM#prepare-screen-resolution

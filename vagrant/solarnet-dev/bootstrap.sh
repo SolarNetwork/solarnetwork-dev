@@ -13,6 +13,13 @@ WORKSPACE="/home/solardev/workspace"
 # Expand root
 sudo resize2fs /dev/sda1
 
+# Apply local settings
+if [ -d /vagrant/local-root ]; then
+	echo "Copying local VM settings from local-root directory..."
+	sudo cp -Rv /vagrant/local-root/* /
+fi
+
+# Setup hostname
 grep -q $HOST /etc/hostname
 if [ $? -ne 0 ]; then
 	echo "Setting up $HOST hostname"
@@ -25,6 +32,7 @@ if [ $? -ne 0 ]; then
 	sudo hostname $HOST
 fi
 
+# Setup DNS to resolve hostname
 grep -q $HOST /etc/hosts
 if [ $? -ne 0 ]; then
 	echo "Setting up $HOST host entry"
