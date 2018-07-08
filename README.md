@@ -2,8 +2,8 @@
 
 Development support for SolarNetwork:
 
-* natively on OSX
-* using a VM on Linux, OSX or Windows
+* natively [on OS X](#os-x)
+* using a [Vagrant virtual machine](#vagrant-vm) (VM) on Linux, OS X, or Windows
 
 Folder structure:
 
@@ -17,7 +17,7 @@ Once you've installed the development environment either locally or using vagran
 
 ## Local installation
 
-### OSX
+### OS X
 
 Requirements:
 
@@ -32,8 +32,10 @@ From the command line go into `bin` directory and run the `./setup.sh` script to
 
 e.g.
 
-	cd ~/solarnet-dev/bin
-	./setup.sh ~/solarnet-workspace
+```sh
+cd ~/solarnet-dev/bin
+./setup.sh ~/solarnet-workspace
+```
 
 ## Vagrant VM
 
@@ -47,8 +49,10 @@ Requirements:
 
 From the command line go into the `vagrant/solarnet-dev` directory and run the command: `vagrant up`.
 
-	cd ~/solarnet-dev/vagrant/solarnet-dev
-	vagrant up
+```sh
+cd ~/solarnet-dev/vagrant/solarnet-dev
+vagrant up
+```
 
 The default installation uses a minimal fluxbox desktop environment and limited system resources. These can be overridden using by creating a file named `Vagrantfile.local` along side the default `Vagrantfile` which allows the following setting to be overridden:
 
@@ -62,11 +66,32 @@ The default installation uses a minimal fluxbox desktop environment and limited 
 |postgres_version|9.6|the version of PostgreSQL to install|
 |java_version|8|the version of java to install|
 |git_branch|develop|the git branch to checkout|
+|git_repos|build external common central node|the SolarNetwork repos to checkout|
 |desktop_packages|xorg xserver-xorg-legacy fluxbox virtualbox-guest-dkms pgadmin3|can be used to override fluxbox as the desktop|
+
+You can change `git_repos` to include SolarDRAS by adding ` dras` to the default value.
 
 Examples for the desktop_packages variable include:
 * virtualbox-guest-dkms virtualbox-guest-additions-iso virtualbox-guest-utils ubuntu-desktop --no-install-recommends
 * virtualbox-guest-dkms virtualbox-guest-additions-iso virtualbox-guest-utils xubuntu-desktop --no-install-recommends
 * virtualbox-guest-dkms virtualbox-guest-additions-iso lubuntu-desktop
 
-To adjust the screen size of the VM, refer to the [screen resolution section of the setup guide](https://github.com/SolarNetwork/solarnetwork/wiki/Developer-VM#prepare-screen-resolution).
+An example `Vagrantfile.local` file looks like this:
+
+```
+vm_define = "solarnet-bionic"
+vm_name = "SolarNet Bionic"
+basebox_name = "ubuntu/bionic64"
+postgres_version = 10
+```
+
+### OS customization
+
+You can create a `local-root` folder next to the `Vagrantfile` and place any files you'd
+like to copy into the VM. They will be copied as the `root` user and folders will be preserved.
+
+For example, you can adjust the screen size of the VM by creating a
+`local-root/etc/X11/xorg.conf.d/10-monitor.conf` file as outlined in the [screen resolution
+section of the setup guide][screen-res].
+
+ [screen-res]: https://github.com/SolarNetwork/solarnetwork/wiki/Developer-VM#prepare-screen-resolution

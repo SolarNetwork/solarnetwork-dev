@@ -55,9 +55,9 @@ fi
 
 if [ -x /usr/bin/X ]; then
 	eclipseDownload=/var/tmp/eclipse.tgz
-	eclipseName=Oxygen
-	eclipseDownloadURL='http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/oxygen/2/eclipse-jee-oxygen-2-linux-gtk-x86_64.tar.gz&r=1'
-	eclipseDownloadSHA512=f4cb8610200faca1658a78599cd695522ccbc16de3be1e6feda8e211fbd6e42437a581634c67c5dba2ef14ddbaf069af30418881f2eb012d883ff61bb64cd91e
+	eclipseName=Photon
+	eclipseDownloadURL='http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/photon/R/eclipse-jee-photon-R-linux-gtk-x86_64.tar.gz&r=1'
+	eclipseDownloadSHA512=c7bc139310ccaf899daf7c8846a2d53c14d0fa580036d5ba71494a354bc03939c856bde1f736d7ea804cd28cc6f959e8e4ac59b543718f3e846af716aeec8638
 	eclipseDownloadHash=
 
 	eclipseHashFile () {

@@ -6,6 +6,7 @@
 GIT_HOME=$1
 GIT_BRANCH=${2:-develop}
 GIT_BRANCH_FALLBACK=develop
+GIT_REPOS=${3:-build external common central node}
 
 # Make sure that a workspace has been specified
 if [ -z "$GIT_HOME" ]; then
@@ -19,10 +20,8 @@ fi
 
 echo "Checking out SolarNetwork branch $GIT_BRANCH sources to: $GIT_HOME"
 
-# Setup Eclipse
 # Checkout SolarNetwork sources
-# TODO make repository list configurable
-for proj in build external common central node dras; do
+for proj in $GIT_REPOS; do
 	if [ ! -d $GIT_HOME/solarnetwork-$proj ]; then
 		echo -e "\nCloning project solarnetwork-$proj..."
 		mkdir -p $GIT_HOME/solarnetwork-$proj

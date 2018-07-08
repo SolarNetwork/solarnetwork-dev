@@ -4,7 +4,8 @@ JAVAVER=$1
 PGVER=$2
 HOST=$3
 GIT_BRANCH=$4
-DESKTOP_PACKAGES=${@:5}
+GIT_REPOS=$5
+DESKTOP_PACKAGES=$6
 
 GIT_HOME="/home/solardev/git"
 WORKSPACE="/home/solardev/workspace"
@@ -12,6 +13,13 @@ WORKSPACE="/home/solardev/workspace"
 # Expand root
 sudo resize2fs /dev/sda1
 
+# Apply local settings
+if [ -d /vagrant/local-root ]; then
+	echo "Copying local VM settings from local-root directory..."
+	sudo cp -Rv /vagrant/local-root/* /
+fi
+
+# Setup hostname
 grep -q $HOST /etc/hostname
 if [ $? -ne 0 ]; then
 	echo "Setting up $HOST hostname"
@@ -24,6 +32,7 @@ if [ $? -ne 0 ]; then
 	sudo hostname $HOST
 fi
 
+# Setup DNS to resolve hostname
 grep -q $HOST /etc/hosts
 if [ $? -ne 0 ]; then
 	echo "Setting up $HOST host entry"
@@ -88,7 +97,7 @@ fi
 getent passwd solardev >/dev/null
 if [ $? -ne 0 ]; then
 	echo -e '\nAdding solardev user.'
-	sudo useradd -c 'SolarNet Developer' -m -U solardev
+	sudo useradd -c 'SolarNet Developer' -s /bin/bash -m -U solardev
 	sudo sh -c 'echo "solardev:solardev" |chpasswd'
 fi
 
@@ -124,7 +133,7 @@ if [ $? -ne 0 ]; then
 	sudo -u postgres createuser -AD solarnet
 	sudo -u postgres psql -U postgres -d postgres -c "alter user solarnet with password 'solarnet';"
 	sudo -u postgres createdb -E UNICODE -l C -T template0 -O solarnet solarnetwork
-	sudo -u postgres createlang plv8 solarnetwork
+	sudo -u postgres psql -U postgres -d solarnetwork -c "CREATE EXTENSION IF NOT EXISTS plv8 WITH SCHEMA pg_catalog;"
 	sudo -u postgres psql -U postgres -d solarnetwork -c "CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public;"
 	sudo -u postgres psql -U postgres -d solarnetwork -c "CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;"
 fi
@@ -135,7 +144,7 @@ if [ $? -ne 0 ]; then
 	sudo -u postgres createuser -AD solarnet_test
 	sudo -u postgres psql -U postgres -d postgres -c "alter user solarnet_test with password 'solarnet_test';"
 	sudo -u postgres createdb -E UNICODE -l C -T template0 -O solarnet_test solarnet_unittest
-	sudo -u postgres createlang plv8 solarnet_unittest
+	sudo -u postgres psql -U postgres -d solarnet_unittest -c "CREATE EXTENSION IF NOT EXISTS plv8 WITH SCHEMA pg_catalog;"
 	sudo -u postgres psql -U postgres -d solarnet_unittest -c "CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public;"
 	sudo -u postgres psql -U postgres -d solarnet_unittest -c "CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;"
 fi
@@ -148,7 +157,7 @@ fi
 
 # Check out the source code
 if [ -x /vagrant/bin/solardev-git.sh ]; then
-	sudo -i -u solardev /vagrant/bin/solardev-git.sh $GIT_HOME $GIT_BRANCH
+	sudo -i -u solardev /vagrant/bin/solardev-git.sh $GIT_HOME $GIT_BRANCH "$GIT_REPOS"
 fi
 
 # Configure the linux installation
