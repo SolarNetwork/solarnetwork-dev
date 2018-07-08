@@ -2,8 +2,8 @@
 
 Development support for SolarNetwork:
 
-* natively on OSX
-* using a VM on Linux, OSX or Windows
+* natively [on OS X](#os-x)
+* using a [Vagrant virtual machine](#vagrant-vm) (VM) on Linux, OS X, or Windows
 
 Folder structure:
 
@@ -17,7 +17,7 @@ Once you've installed the development environment either locally or using vagran
 
 ## Local installation
 
-### OSX
+### OS X
 
 Requirements:
 
@@ -32,8 +32,10 @@ From the command line go into `bin` directory and run the `./setup.sh` script to
 
 e.g.
 
-	cd ~/solarnet-dev/bin
-	./setup.sh ~/solarnet-workspace
+```sh
+cd ~/solarnet-dev/bin
+./setup.sh ~/solarnet-workspace
+```
 
 ## Vagrant VM
 
@@ -47,8 +49,10 @@ Requirements:
 
 From the command line go into the `vagrant/solarnet-dev` directory and run the command: `vagrant up`.
 
-	cd ~/solarnet-dev/vagrant/solarnet-dev
-	vagrant up
+```sh
+cd ~/solarnet-dev/vagrant/solarnet-dev
+vagrant up
+```
 
 The default installation uses a minimal fluxbox desktop environment and limited system resources. These can be overridden using by creating a file named `Vagrantfile.local` along side the default `Vagrantfile` which allows the following setting to be overridden:
 
