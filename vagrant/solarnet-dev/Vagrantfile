@@ -8,18 +8,18 @@
 vm_define="solarnet"
 bootstrap_path="bootstrap.sh"
 vm_name="SolarNet Dev"
-basebox_name="ubuntu/artful64"
+basebox_name="ubuntu/bionic64"
 no_of_cpus=1
 memory_size=2048
 vm_gui=true
 
 git_branch="develop"
 git_repos="build external common central node"
-postgres_version=9.6
+postgres_version=10
 java_version=8
 
 # Note xserver-xorg-legacy was only way I could find to get X to start as solardev on login from console
-desktop_packages="xorg xserver-xorg-legacy fluxbox virtualbox-guest-dkms pgadmin3"
+desktop_packages="xorg xserver-xorg-legacy fluxbox virtualbox-guest-dkms virtualbox-guest-additions-iso pgadmin3 xterm"
 
 solarnet_host="solarnetworkdev.net"
 

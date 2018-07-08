@@ -22,14 +22,14 @@ dropuser solarnet_test
 createuser -AD solarnet
 psql -U postgres -d postgres -c "alter user solarnet with password 'solarnet';"
 createdb -E UNICODE -l C -T template0 -O solarnet solarnetwork
-createlang plv8 solarnetwork
+psql -U postgres -d solarnetwork -c "CREATE EXTENSION IF NOT EXISTS plv8 WITH SCHEMA pg_catalog;"
 psql -U postgres -d solarnetwork -c "CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public;"
 psql -U postgres -d solarnetwork -c "CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;"
 
 createuser -AD solarnet_test
 psql -U postgres -d postgres -c "alter user solarnet_test with password 'solarnet_test';"
 createdb -E UNICODE -l C -T template0 -O solarnet_test solarnet_unittest
-createlang plv8 solarnet_unittest
+psql -U postgres -d solarnet_unittest -c "CREATE EXTENSION IF NOT EXISTS plv8 WITH SCHEMA pg_catalog;"
 psql -U postgres -d solarnet_unittest -c "CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public;"
 psql -U postgres -d solarnet_unittest -c "CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;"
 
