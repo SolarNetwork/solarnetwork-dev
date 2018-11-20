@@ -171,7 +171,7 @@ if [ ! -e $WORKSPACE/SolarNetworkTeamProjectSet.psf ]; then
 EOF
 
   cd $GIT_HOME
-  projects=`ls -1d */*`
+  projects=`find */* -type d -prune`
   for project in $projects; do
     if elementIn "$project" "${skipProjects[@]}"; then
       echo "Skipping project $project"
