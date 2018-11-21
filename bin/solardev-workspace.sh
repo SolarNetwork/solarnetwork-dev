@@ -58,7 +58,12 @@ if [ ! -e $WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches/SolarNe
   if [ ! -d $WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches ]; then
     mkdir -p $WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches
   fi
-  cp $LAUNCH_FILE $WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches
+  # turn project dir list of *.test projects into comma-delimited list of names
+  excludeProjectNames=$(find $GIT_HOME/*/* -type d -prune -name '*.test' -print |awk -F/ '{print $NF}' |tr '\n' ',')
+  # have to treat the "external" projects differently, because folder names do not include ".external" part of project name
+  excludeExternalProjectNames=$(find $GIT_HOME/solarnetwork-external/* -type d -prune -name '*.test' -print \
+  	|awk -F/ '{gsub("net.solarnetwork","net.solarnetwork.external",$NF); print $NF}' |tr '\n' ',' |sed 's/,$//')
+  sed "s/__IGNORE_LAUNCH__/$excludeProjectNames$excludeExternalProjectNames/" $LAUNCH_FILE >$WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches/SolarNetwork.launch 
 fi
 
 # Configure SolarNetwork toString() format template
