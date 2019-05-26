@@ -1,0 +1,49 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+#------------------------------------------------------------------------------
+# VM Environment and parameter configuration
+# These settings can be overridden by creating a file named Vagrantfile.local
+#------------------------------------------------------------------------------
+vm_define="solarnode-deb9"
+vm_name="SolarNode Deb9"
+vm_box="bento/debian-9.6-i386"
+vm_box_version=">= 201812.27.0"
+cpu_count=1
+memory_size=1024
+vm_gui=false
+setup_path="bin/setup-solarnode-debian.sh"
+setup_args="-n"
+
+# Read any user specific configuration overrides - cater for this file not existing
+local_env_config_file="Vagrantfile.local"
+begin
+	localsettings = File.read local_env_config_file
+	eval localsettings
+	rescue Errno::ENOENT
+end
+
+Vagrant.configure(2) do |config|
+	config.vm.box = vm_box
+	config.vm.box_version = vm_box_version
+	config.vm.define vm_define
+	config.vm.network "private_network", type: "dhcp"
+	config.vm.synced_folder ".", "/vagrant", type: "rsync", id: "vagrant-root", :mount_options => ["dmode=755"]
+
+	config.vm.provision :shell, inline: "/vagrant/#{setup_path} #{setup_args}"
+
+	config.vm.provider "virtualbox" do |v|
+		v.gui = vm_gui
+		v.memory = memory_size
+		v.cpus = cpu_count
+		v.name = vm_name
+	end
+
+	config.vm.provider "vmware_desktop" do |v|
+		v.gui = vm_gui
+		v.vmx["memsize"] = memory_size
+		v.vmx["numvcpus"] = cpu_count
+		v.vmx["ethernet0.pcislotnumber"] = "32"
+	end
+
+end

@@ -1,0 +1,10 @@
+libmodbus
+mbpoll
+openjdk-8-jre-headless
+sn-iptables
+sn-rxtx
+sn-solarpkg
+sn-solarssh
+sn-system
+solarnode-base
+solarnode-app-core
