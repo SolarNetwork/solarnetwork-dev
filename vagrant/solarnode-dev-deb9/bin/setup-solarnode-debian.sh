@@ -35,7 +35,7 @@ Arguments:
                           https://debian.repo.stage.solarnetwork.org.nz;
                           or the staging repo can be accessed directly for development as
                           http://snf-debian-repo-stage.s3-website-us-west-2.amazonaws.com
- -r <pkg dist>          - the package distribution to use; defaults to 'stretch'
+ -q <pkg dist>          - the package distribution to use; defaults to 'stretch'
  -s <pkg add file>      - path to a file with names of packages to add, one per line;
                           defaults to /vagrant/conf/packages-add.txt
  -U <user pass>         - the app user password; defaults to solar
@@ -43,13 +43,13 @@ Arguments:
 EOF
 }
 
-while getopts ":h:nPp:U:u:" opt; do
+while getopts ":h:nPp:q:U:u:" opt; do
 	case $opt in
 		h) HOSTNAME="${OPTARG}";;
 		n) DRY_RUN='TRUE';;
 		P) UPDATE_PKG_CACHE='TRUE';;
 		p) SNF_PKG_REPO="${OPTARG}";;
-		r) PKG_DIST="${OPTARG}";;
+		q) PKG_DIST="${OPTARG}";;
 		s) PKG_ADD="${OPTARG}";;
 		U) APP_USER_PASS="${OPTARG}";;
 		u) APP_USER="${OPTARG}";;
