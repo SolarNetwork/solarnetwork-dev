@@ -1,4 +1,3 @@
-.vagrant
 .DS_Store
-
-vagrant/solarnet-dev/Vagrantfile.local
+.vagrant
+Vagrantfile.local

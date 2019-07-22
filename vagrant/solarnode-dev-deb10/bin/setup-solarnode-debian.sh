@@ -1,0 +1,1 @@
+../../solarnode-dev-deb9/bin/setup-solarnode-debian.sh
