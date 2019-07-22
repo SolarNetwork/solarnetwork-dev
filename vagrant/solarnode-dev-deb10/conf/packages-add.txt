@@ -1,0 +1,9 @@
+libmodbus
+mbpoll
+sn-iptables
+sn-rxtx
+sn-solarpkg
+sn-solarssh
+sn-system
+solarnode-base
+solarnode-app-core
