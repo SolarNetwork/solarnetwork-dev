@@ -146,6 +146,7 @@ EOF
 skipProjects=("solarnetwork-build/archiva-obr-plugin" \
   "solarnetwork-build/net.solarnetwork.pki.sun.security" \
   "solarnetwork-central/net.solarnetwork.central.common.mail.javamail" \
+  "solarnetwork-central/net.solarnetwork.central.common.mail.javamail.test" \
   "solarnetwork-central/net.solarnetwork.central.in.mqtt" \
   "solarnetwork-central/net.solarnetwork.central.in.mqtt.test" \
   "solarnetwork-central/net.solarnetwork.central.user.billing.aop" \
