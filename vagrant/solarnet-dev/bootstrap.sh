@@ -63,14 +63,14 @@ echo -e '\nUpdating package cache...'
 sudo apt-get update
 
 echo -e '\nUpgrading outdated packages...'
-sudo apt-get upgrade -y
+sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -qy
 
 echo -e '\nInstalling language-pack...'
-sudo apt-get install -y language-pack-en
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy language-pack-en
 
 if [ -n "$DESKTOP_PACKAGES" ]; then
 	echo -e "\nInstalling Desktop Packages: $DESKTOP_PACKAGES"
-	sudo apt-get install -y $DESKTOP_PACKAGES
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq $DESKTOP_PACKAGES
 fi
 
 echo -e "\nInstalling Postgres $PGVER and Java $JAVAVER..."
@@ -78,12 +78,12 @@ javaPkg=openjdk-$JAVAVER-jdk
 if [ -z "$DESKTOP_PACKAGES" ]; then
 	javaPkg="${javaPkg}-headless"
 fi
-sudo apt-get install -y postgresql-$PGVER postgresql-$PGVER-plv8 postgresql-contrib-$PGVER git git-flow $javaPkg librxtx-java
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy postgresql-$PGVER postgresql-$PGVER-plv8 postgresql-contrib-$PGVER git git-flow $javaPkg librxtx-java
 
 if [ -n "$DESKTOP_PACKAGES" ]; then
 	echo -e '\nInstalling web browsers...'
 	# Note libwebkitgtk is required for Eclipse to support an internal browser
-	sudo apt-get install -y firefox libwebkitgtk-3.0-0
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy firefox libwebkitgtk-3.0-0
 fi
 
 if [ -e /usr/share/java/RXTXcomm.jar -a -d /usr/lib/jvm/java-$JAVAVER-openjdk-i386/jre/lib/ext \
