@@ -48,13 +48,18 @@ if [ ! -d $GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/config ]; then
 		> $GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/config/tomcat-server.xml
 fi
 
-if [ ! -e $GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/configurations/services/net.solarnetwork.central.dao.jdbc.cfg ]; then
+if [ ! -e $GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/configurations/services/net.solarnetwork.jdbc.pool.hikari-central.cfg ]; then
 	echo -e '\nCreating JDBC configuration...'
-	cat > $GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/configurations/services/net.solarnetwork.central.dao.jdbc.cfg <<-EOF
-		jdbc.driver = org.postgresql.Driver
-		jdbc.url = jdbc:postgresql://localhost:5432/solarnetwork
-		jdbc.user = solarnet
-		jdbc.pass = solarnet
+	cat > $GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/configurations/services/net.solarnetwork.jdbc.pool.hikari-central.cfg <<-EOF
+		service.factoryPid = net.solarnetwork.jdbc.pool.hikari
+		serviceProperty.db = central
+		dataSourceFactory.filter = (osgi.jdbc.driver.class=org.postgresql.Driver)
+		dataSource.url = jdbc:postgresql://localhost:5432/solarnetwork
+		dataSource.user = solarnet
+		dataSource.password = solarnet
+		pingTest.query = SELECT CURRENT_TIMESTAMP
+		minimumIdle = 1
+		maximumPoolSize = 10
 EOF
 fi
 
