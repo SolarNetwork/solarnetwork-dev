@@ -68,6 +68,9 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -qy
 echo -e '\nInstalling language-pack...'
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy language-pack-en
 
+echo -e '\nInstalling git...'
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy git git-lfs
+
 if [ -n "$DESKTOP_PACKAGES" ]; then
 	echo -e "\nInstalling Desktop Packages: $DESKTOP_PACKAGES"
 	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq $DESKTOP_PACKAGES
