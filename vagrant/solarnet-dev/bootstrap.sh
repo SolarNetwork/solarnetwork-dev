@@ -70,6 +70,10 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy language-pack-en
 
 echo -e '\nInstalling git...'
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy git git-lfs
+if ! grep -q lfs ~/.gitconfig >/dev/null 2>/dev/null; then
+	echo -e '\nInitializing git LFS...'
+	git lfs install --skip-repo
+fi
 
 if [ -n "$DESKTOP_PACKAGES" ]; then
 	echo -e "\nInstalling Desktop Packages: $DESKTOP_PACKAGES"
