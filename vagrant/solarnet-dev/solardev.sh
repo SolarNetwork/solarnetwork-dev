@@ -55,9 +55,9 @@ fi
 
 if [ -x /usr/bin/X ]; then
 	eclipseDownload=/var/tmp/eclipse.tgz
-	eclipseName=Photon
-	eclipseDownloadURL='http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/photon/R/eclipse-jee-photon-R-linux-gtk-x86_64.tar.gz&r=1'
-	eclipseDownloadSHA512=c7bc139310ccaf899daf7c8846a2d53c14d0fa580036d5ba71494a354bc03939c856bde1f736d7ea804cd28cc6f959e8e4ac59b543718f3e846af716aeec8638
+	eclipseName=2019-06
+	eclipseDownloadURL='http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/2019-06/R/eclipse-jee-2019-06-R-linux-gtk-x86_64.tar.gz&r=1'
+	eclipseDownloadSHA512=fde7854557b8359d8a842d84d0bc5ad297316b5a897081c100bd4645568c75dbd5b2646883b90ef0f88ed332de92af8221a6dfe68f36241d590b32cefd821631
 	eclipseDownloadHash=
 
 	eclipseHashFile () {
