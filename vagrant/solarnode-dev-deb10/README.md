@@ -1,4 +1,4 @@
-# SolarNode Development VM - Debian 9 i386
+# SolarNode Development VM - Debian 10 i386
 
 This project contains a Vagrant setup for a SolarNode development environment using a Linux virtual
 machine. Once you have Vagrant and VirtualBox installed, you can run
