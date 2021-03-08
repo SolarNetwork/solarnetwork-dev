@@ -74,6 +74,8 @@ if [ ! -e $GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/configurations/s
 		SimpleNetworkIdentityBiz.host = solarnetworkdev.net
 		SimpleNetworkIdentityBiz.port = 8683
 		SimpleNetworkIdentityBiz.forceTLS = true
+		SimpleNetworkIdentityBiz.solarUserBaseURL = https://solarnetworkdev.net:8683/solaruser
+		SimpleNetworkIdentityBiz.solarQueryBaseURL = https://solarnetworkdev.net:8683/solarquery
 EOF
 fi
 
