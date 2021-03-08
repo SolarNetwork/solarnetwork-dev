@@ -14,6 +14,11 @@ if [ -z "$GIT_HOME" ]; then
   exit 1
 fi
 
+if ! grep -q lfs ~/.gitconfig >/dev/null 2>/dev/null; then
+	echo -e '\nInitializing git LFS...'
+	git lfs install --skip-repo
+fi
+
 if [ ! -d $GIT_HOME ]; then
   mkdir -p $GIT_HOME
 fi
