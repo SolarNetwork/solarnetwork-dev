@@ -85,7 +85,7 @@ javaPkg=openjdk-$JAVAVER-jdk
 if [ -z "$DESKTOP_PACKAGES" ]; then
 	javaPkg="${javaPkg}-headless"
 fi
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy postgresql-$PGVER postgresql-$PGVER-plv8 postgresql-contrib-$PGVER git git-flow $javaPkg librxtx-java
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy postgresql-$PGVER postgresql-contrib-$PGVER git git-flow $javaPkg librxtx-java
 
 if [ -n "$DESKTOP_PACKAGES" ]; then
 	echo -e '\nInstalling web browsers...'
@@ -106,13 +106,6 @@ if [ $? -ne 0 ]; then
 	echo -e '\nAdding solardev user.'
 	sudo useradd -c 'SolarNet Developer' -s /bin/bash -m -U solardev
 	sudo sh -c 'echo "solardev:solardev" |chpasswd'
-fi
-
-grep -q plv8.start_proc /etc/postgresql/$PGVER/main/postgresql.conf
-if [ $? -ne 0 -a -e /etc/postgresql/$PGVER/main/postgresql.conf ]; then
-	echo -e '\nConfiguring plv8 global procedure...'
-	sudo sh -c "echo \"plv8.start_proc = 'plv8_startup'\" >> /etc/postgresql/$PGVER/main/postgresql.conf"
-	sudo service postgresql restart
 fi
 
 sudo grep -q solarnet /etc/postgresql/$PGVER/main/pg_ident.conf
@@ -140,9 +133,9 @@ if [ $? -ne 0 ]; then
 	sudo -u postgres createuser -AD solarnet
 	sudo -u postgres psql -U postgres -d postgres -c "alter user solarnet with password 'solarnet';"
 	sudo -u postgres createdb -E UNICODE -l C -T template0 -O solarnet solarnetwork
-	sudo -u postgres psql -U postgres -d solarnetwork -c "CREATE EXTENSION IF NOT EXISTS plv8 WITH SCHEMA pg_catalog;"
-	sudo -u postgres psql -U postgres -d solarnetwork -c "CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public;"
-	sudo -u postgres psql -U postgres -d solarnetwork -c "CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;"
+	sudo -u postgres psql -U postgres -d solarnetwork -c 'CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public'
+	sudo -u postgres psql -U postgres -d solarnetwork -c 'CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public'
+	sudo -u postgres psql -U postgres -d solarnetwork -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public'
 fi
 
 sudo -u postgres sh -c "psql -d solarnet_unittest -c 'SELECT now()'" >/dev/null 2>&1
@@ -151,9 +144,9 @@ if [ $? -ne 0 ]; then
 	sudo -u postgres createuser -AD solarnet_test
 	sudo -u postgres psql -U postgres -d postgres -c "alter user solarnet_test with password 'solarnet_test';"
 	sudo -u postgres createdb -E UNICODE -l C -T template0 -O solarnet_test solarnet_unittest
-	sudo -u postgres psql -U postgres -d solarnet_unittest -c "CREATE EXTENSION IF NOT EXISTS plv8 WITH SCHEMA pg_catalog;"
-	sudo -u postgres psql -U postgres -d solarnet_unittest -c "CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public;"
-	sudo -u postgres psql -U postgres -d solarnet_unittest -c "CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;"
+	sudo -u postgres psql -U postgres -d solarnet_unittest -c 'CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public'
+	sudo -u postgres psql -U postgres -d solarnet_unittest -c 'CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public'
+	sudo -u postgres psql -U postgres -d solarnet_unittest -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public'
 fi
 
 if [ ! -e /etc/sudoers.d/solardev -a -e /vagrant/solardev.sudoers ]; then
