@@ -77,7 +77,7 @@ fi
 
 if [ -n "$DESKTOP_PACKAGES" ]; then
 	echo -e "\nInstalling Desktop Packages: $DESKTOP_PACKAGES"
-	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq --no-install-recommends $DESKTOP_PACKAGES
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq $DESKTOP_PACKAGES
 fi
 
 echo -e "\nInstalling Postgres $PGVER and Java $JAVAVER..."

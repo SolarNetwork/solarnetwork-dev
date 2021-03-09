@@ -19,7 +19,7 @@ postgres_version=12
 java_version=8
 
 # Note xserver-xorg-legacy was only way I could find to get X to start as solardev on login from console
-desktop_packages="xorg xserver-xorg-legacy xserver-xorg-video-vesa xserver-xorg-video-vmware xfonts-scalable fluxbox eterm xfonts-terminus virtualbox-guest-dkms virtualbox-guest-additions-iso virtualbox-guest-x11 pgadmin3 xterm"
+desktop_packages="xorg xserver-xorg-legacy xserver-xorg-video-vesa xserver-xorg-video-vmware xfonts-scalable fluxbox eterm xfonts-terminus virtualbox-guest-dkms virtualbox-guest-additions-iso virtualbox-guest-x11 pgadmin3 xterm --no-install-recommends"
 
 solarnet_host="solarnetworkdev.net"
 
