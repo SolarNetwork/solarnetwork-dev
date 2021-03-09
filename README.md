@@ -60,14 +60,14 @@ The default installation uses a minimal fluxbox desktop environment and limited 
 |------|---------|-------------|
 |vm_define|solarnet|the unique ID that identifies the VM that is generated|
 |vm_name|SolarNet Dev|the user friendly name of the VM|
-|basebox_name|ubuntu/artful64|the name/id of the vagrant base box to create the VM from|
+|basebox_name|ubuntu/focal64|the name/id of the vagrant base box to create the VM from|
 |no_of_cpus|1|the number of virtual CPUs|
 |memory_size|2048|the memory to assign to the VM|
-|postgres_version|9.6|the version of PostgreSQL to install|
+|postgres_version|12|the version of PostgreSQL to install|
 |java_version|8|the version of java to install|
 |git_branch|develop|the git branch to checkout|
 |git_repos|build external common central node|the SolarNetwork repos to checkout|
-|desktop_packages|xorg xserver-xorg-legacy fluxbox virtualbox-guest-dkms pgadmin3|can be used to override fluxbox as the desktop|
+|desktop_packages|xorg xserver-xorg-legacy xserver-xorg-video-vesa xserver-xorg-video-vmware xfonts-scalable fluxbox eterm xfonts-terminus virtualbox-guest-dkms virtualbox-guest-additions-iso virtualbox-guest-x11 pgadmin3 xterm|can be used to override fluxbox as the desktop|
 
 You can change `git_repos` to include SolarDRAS by adding ` dras` to the default value.
 
