@@ -77,7 +77,7 @@ fi
 
 if [ -n "$DESKTOP_PACKAGES" ]; then
 	echo -e "\nInstalling Desktop Packages: $DESKTOP_PACKAGES"
-	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq $DESKTOP_PACKAGES
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq --no-install-recommends $DESKTOP_PACKAGES
 fi
 
 echo -e "\nInstalling Postgres $PGVER and Java $JAVAVER..."
@@ -87,10 +87,17 @@ if [ -z "$DESKTOP_PACKAGES" ]; then
 fi
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy postgresql-$PGVER postgresql-contrib-$PGVER git git-flow $javaPkg librxtx-java
 
+sudo grep -q 'jit = on' /etc/postgresql/$PGVER/main/postgresql.conf 2>/dev/null
+if [ $? -eq 0 ]; then
+	echo -e '\nDisabling JIT in Postgres...'
+	sudo sed -i -e 's/^#*jit = .*/jit = off/' /etc/postgresql/$PGVER/main/postgresql.conf
+	sudo service postgresql restart
+fi
+
 if [ -n "$DESKTOP_PACKAGES" ]; then
 	echo -e '\nInstalling web browsers...'
 	# Note libwebkitgtk is required for Eclipse to support an internal browser
-	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy firefox libwebkitgtk-3.0-0
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy firefox libwebkit2gtk-4.0-37
 fi
 
 if [ -e /usr/share/java/RXTXcomm.jar -a -d /usr/lib/jvm/java-$JAVAVER-openjdk-i386/jre/lib/ext \
