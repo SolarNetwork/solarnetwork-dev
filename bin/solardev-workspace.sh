@@ -144,11 +144,15 @@ EOF
 }
 
 skipProjects=("solarnetwork-build/archiva-obr-plugin" \
+  "solarnetwork-build/bundle-helper" \
   "solarnetwork-build/net.solarnetwork.pki.sun.security" \
   "solarnetwork-central/net.solarnetwork.central.common.mail.javamail" \
   "solarnetwork-central/net.solarnetwork.central.common.mail.javamail.test" \
   "solarnetwork-central/net.solarnetwork.central.in.mqtt" \
   "solarnetwork-central/net.solarnetwork.central.in.mqtt.test" \
+  "solarnetwork-central/net.solarnetwork.central.in.ocpp.json" \
+  "solarnetwork-central/net.solarnetwork.central.in.ocpp.mqtt" \
+  "solarnetwork-central/net.solarnetwork.central.in.ocpp.mqtt.test" \
   "solarnetwork-central/net.solarnetwork.central.user.billing.aop" \
   "solarnetwork-central/net.solarnetwork.central.user.billing.biz.dao" \
   "solarnetwork-central/net.solarnetwork.central.user.billing.biz.dao.test" \
@@ -161,6 +165,7 @@ skipProjects=("solarnetwork-build/archiva-obr-plugin" \
   "solarnetwork-central/net.solarnetwork.central.user.pki.dogtag" \
   "solarnetwork-central/net.solarnetwork.central.user.pki.dogtag.test" \
   "solarnetwork-common/net.solarnetwork.pidfile" \
+  "solarnetwork-external/aws-s3-osgi" \
   "solarnetwork-node/net.solarnetwork.node.config" \
   "solarnetwork-node/net.solarnetwork.node.setup.developer" \
   "solarnetwork-node/net.solarnetwork.node.upload.mock" \

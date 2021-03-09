@@ -14,6 +14,11 @@ if [ -z "$GIT_HOME" ]; then
   exit 1
 fi
 
+if ! grep -q lfs ~/.gitconfig >/dev/null 2>/dev/null; then
+	echo -e '\nInitializing git LFS...'
+	git lfs install --skip-repo
+fi
+
 if [ ! -d $GIT_HOME ]; then
   mkdir -p $GIT_HOME
 fi
@@ -69,6 +74,8 @@ if [ ! -e $GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/configurations/s
 		SimpleNetworkIdentityBiz.host = solarnetworkdev.net
 		SimpleNetworkIdentityBiz.port = 8683
 		SimpleNetworkIdentityBiz.forceTLS = true
+		SimpleNetworkIdentityBiz.solarUserBaseURL = https://solarnetworkdev.net:8683/solaruser
+		SimpleNetworkIdentityBiz.solarQueryBaseURL = https://solarnetworkdev.net:8683/solarquery
 EOF
 fi
 
