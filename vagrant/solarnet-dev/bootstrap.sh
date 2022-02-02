@@ -94,7 +94,7 @@ fi
 
 # Configure Timescale repo
 if [ ! -e /etc/apt/sources.list.d/timescaledb.list ]; then
-	sudo sh -c "echo 'deb https://packagecloud.io/timescale/timescaledb/ubuntu/ $(lsb_release -c -s) main' > /etc/apt/sources.list.d/timescaledb.list"
+	sudo sh -c "echo 'deb https://packagecloud.io/timescale/timescaledb/ubuntu/ $(lsb_release -cs) main' > /etc/apt/sources.list.d/timescaledb.list"
 	sudo sh -c 'wget --quiet -O - https://packagecloud.io/timescale/timescaledb/gpgkey | apt-key add -'
 	sudo apt update
 fi
@@ -103,6 +103,13 @@ fi
 if [ ! -e /etc/apt/sources.list.d/solarnetwork.list ]; then
 	sudo sh -c "echo 'deb https://debian.repo.solarnetwork.org.nz ${DEB_RELEASE} main' > /etc/apt/sources.list.d/solarnetwork.list"
 	sudo sh -c 'wget --quiet -O - https://debian.repo.solarnetwork.org.nz/KEY.gpg | apt-key add -'
+	sudo apt update
+fi
+
+# Configure pgAdmin repo
+if [ ! -e /etc/apt/sources.list.d/pgadmin4.list ]; then
+	sudo sh -c "echo 'deb https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/$(lsb_release -cs) pgadmin4 main' > /etc/apt/sources.list.d/pgadmin4.list"
+	sudo sh -c 'wget --quiet -O - https://www.pgadmin.org/static/packages_pgadmin_org.pub | apt-key add -'
 	sudo apt update
 fi
 

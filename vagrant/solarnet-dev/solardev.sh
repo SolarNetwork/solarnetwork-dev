@@ -96,8 +96,8 @@ if [ -x /usr/bin/fluxbox -a ! -e ~/.fluxbox/menu ]; then
 	cat > ~/.fluxbox/menu <<EOF
 [begin] (SolarNetwork Dev)
         [exec] (Eclipse) { ~/eclipse/eclipse -data $WORKSPACE } <~/eclipse/icon.xpm>
-        [exec] (Firefox) { firefox } </usr/share/pixmaps/firefox.png>
-        [exec] (pgAdminIII) { pgadmin3 } </usr/share/pixmaps/pgadmin3.xpm>
+        [exec] (Firefox) { firefox } </usr/share/icons/hicolor/16x16/apps/firefox.png>
+        [exec] (pgAdmin4) { /usr/pgadmin4/bin/pgadmin4 } </usr/share/icons/hicolor/16x16/apps/pgadmin4.png>
         [submenu] (Shells) {}
                 [exec] (Bash) { x-terminal-emulator -T "Bash" -e /bin/bash --login} <>
                 [exec] (Dash) { x-terminal-emulator -T "Dash" -e /bin/dash -i} <>
