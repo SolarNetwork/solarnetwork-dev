@@ -51,9 +51,9 @@ fi
 
 if [ -x /usr/bin/X ]; then
 	eclipseDownload=/var/tmp/eclipse.tgz
-	eclipseName=2020-12
-	eclipseDownloadURL='https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/2020-12/R/eclipse-jee-2020-12-R-linux-gtk-x86_64.tar.gz&r=1'
-	eclipseDownloadSHA512=fd19769abf9583c343fd6f3f035f05bba6fe36b7a3cc98b85536cdeb24555ddc6f94cd10b412a6fa61c77ffec34ee80d8f6c26fed941b49bf3ccb8c5f7068126
+	eclipseName=2021-12
+	eclipseDownloadURL='https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/2021-12/R/eclipse-jee-2021-12-R-linux-gtk-x86_64.tar.gz&r=1'
+	eclipseDownloadSHA512=0ae2b18dc9ef91139446d6af6493740210ae034c7b35ac994e920e9fda04db5ad4cd5a91d29ef1ec2e513ed319f604b864c59c6324032740558111c1a0ab18a9
 	eclipseDownloadHash=
 
 	eclipseHashFile () {

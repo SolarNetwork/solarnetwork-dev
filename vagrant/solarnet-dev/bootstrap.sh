@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 JAVAVER=$1
 PGVER=$2
@@ -9,6 +9,8 @@ DESKTOP_PACKAGES=$6
 
 GIT_HOME="/home/solardev/git"
 WORKSPACE="/home/solardev/workspace"
+DEB_RELEASE="${DEB_RELEASE:-bullseye}"
+PG_PRELOAD_LIB="${PG_PRELOAD_LIB:-auto_explain,pg_stat_statements,timescaledb}"
 
 # Expand root
 sudo resize2fs /dev/sda1
@@ -20,8 +22,7 @@ if [ -d /vagrant/local-root ]; then
 fi
 
 # Setup hostname
-grep -q $HOST /etc/hostname
-if [ $? -ne 0 ]; then
+if ! grep -q $HOST /etc/hostname 2>/dev/null; then
 	echo "Setting up $HOST hostname"
 	echo $HOST >>/tmp/hostname.new
 	chmod 644 /tmp/hostname.new
@@ -33,8 +34,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Setup DNS to resolve hostname
-grep -q $HOST /etc/hosts
-if [ $? -ne 0 ]; then
+if ! grep -q $HOST /etc/hosts 2>/dev/null; then
 	echo "Setting up $HOST host entry"
 	sed "s/^127.0.0.1[[:space:]]*localhost/127.0.0.1 $HOST localhost/" /etc/hosts >/tmp/hosts.new
 	if [ -z "$(diff /etc/hosts /tmp/hosts.new)" ]; then
@@ -49,8 +49,7 @@ if [ $? -ne 0 ]; then
 	fi
 fi
 
-grep -q '/swapfile' /etc/fstab
-if [ $? -ne 0 ]; then
+if ! grep -q '/swapfile' /etc/fstab 2>/dev/null; then
 	echo -e '\nCreating swapfile...'
 	sudo fallocate -l 1G /swapfile
 	sudo chmod 600 /swapfile
@@ -85,10 +84,32 @@ javaPkg=openjdk-$JAVAVER-jdk
 if [ -z "$DESKTOP_PACKAGES" ]; then
 	javaPkg="${javaPkg}-headless"
 fi
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy postgresql-$PGVER postgresql-contrib-$PGVER git git-flow $javaPkg librxtx-java
+sudo DEBIAN_FRONTEND=noninteractive apt install -qy postgresql-$PGVER postgresql-contrib-$PGVER \
+  gnupg postgresql-common apt-transport-https lsb-release wget \
+  git git-flow $javaPkg librxtx-java
+  
+if [ -x /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh ]; then
+	sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+fi
 
-sudo grep -q 'jit = on' /etc/postgresql/$PGVER/main/postgresql.conf 2>/dev/null
-if [ $? -eq 0 ]; then
+# Configure Timescale repo
+if [ ! -e /etc/apt/sources.list.d/timescaledb.list ]; then
+	sudo sh -c "echo 'deb https://packagecloud.io/timescale/timescaledb/ubuntu/ $(lsb_release -c -s) main' > /etc/apt/sources.list.d/timescaledb.list"
+	sudo sh -c 'wget --quiet -O - https://packagecloud.io/timescale/timescaledb/gpgkey | apt-key add -'
+	sudo apt update
+fi
+
+# Configure SNF repo
+if [ ! -e /etc/apt/sources.list.d/solarnetwork.list ]; then
+	sudo sh -c "echo 'deb https://debian.repo.solarnetwork.org.nz ${DEB_RELEASE} main' > /etc/apt/sources.list.d/solarnetwork.list"
+	sudo sh -c 'wget --quiet -O - https://debian.repo.solarnetwork.org.nz/KEY.gpg | apt-key add -'
+	sudo apt update
+fi
+
+sudo apt install -qy timescaledb-2-postgresql-$PGVER postgresql-$PGVER-aggs-for-vecs
+sudo apt autoremove -qy
+
+if ! grep -q 'jit = on' /etc/postgresql/$PGVER/main/postgresql.conf 2>/dev/null; then
 	echo -e '\nDisabling JIT in Postgres...'
 	sudo sed -i -e 's/^#*jit = .*/jit = off/' /etc/postgresql/$PGVER/main/postgresql.conf
 	sudo service postgresql restart
@@ -108,34 +129,42 @@ if [ -e /usr/share/java/RXTXcomm.jar -a -d /usr/lib/jvm/java-$JAVAVER-openjdk-i3
 fi
 
 # Add the solardev user if it doesn't already exist, password solardev
-getent passwd solardev >/dev/null
-if [ $? -ne 0 ]; then
+
+if ! getent passwd solardev >/dev/null; then
 	echo -e '\nAdding solardev user.'
 	sudo useradd -c 'SolarNet Developer' -s /bin/bash -m -U solardev
 	sudo sh -c 'echo "solardev:solardev" |chpasswd'
 fi
 
-sudo grep -q solarnet /etc/postgresql/$PGVER/main/pg_ident.conf
-if [ $? -ne 0 ]; then
+if grep -q "shared_preload_libraries.*$PG_PRELOAD_LIB" /etc/postgresql/$PGVER/main/postgresql.conf >/dev/null; then
+	echo "shared_preload_libraries already configured in postgresql.conf."
+else
+	echo "Configuring shared_preload_libraries in postgresql.conf"
+	sudo sed -Ei -e 's/#?shared_preload_libraries = '"'.*'"'/shared_preload_libraries = '"'$PG_PRELOAD_LIB'/" \
+		/etc/postgresql/$PGVER/main/postgresql.conf
+	sudo service postgresql restart
+fi
+
+if ! sudo grep -q solarnet /etc/postgresql/$PGVER/main/pg_ident.conf 2>/dev/null; then
 	echo -e '\nConfiguring Postgres solardev user mapping...'
 	sudo sh -c "echo \"solarnet solardev solarnet\" >> /etc/postgresql/$PGVER/main/pg_ident.conf"
 	sudo sh -c "echo \"solartest solardev solarnet_test\" >> /etc/postgresql/$PGVER/main/pg_ident.conf"
 	sudo service postgresql restart
 fi
 
-sudo grep -q map=solarnet /etc/postgresql/$PGVER/main/pg_hba.conf
-if [ $? -ne 0 -a -e /vagrant/pg_hba.sed ]; then
-	echo -e '\nConfiguring Postgres SolarNetwork peer mapping...'
-	sudo sh -c "sed -f /vagrant/pg_hba.sed /etc/postgresql/$PGVER/main/pg_hba.conf > /etc/postgresql/$PGVER/main/pg_hba.conf.new"
-	sudo chown postgres:postgres /etc/postgresql/$PGVER/main/pg_hba.conf.new
-	sudo chmod 640 /etc/postgresql/$PGVER/main/pg_hba.conf.new
-	sudo mv /etc/postgresql/$PGVER/main/pg_hba.conf /etc/postgresql/$PGVER/main/pg_hba.conf.bak
-	sudo mv /etc/postgresql/$PGVER/main/pg_hba.conf.new /etc/postgresql/$PGVER/main/pg_hba.conf
-	sudo service postgresql restart
+if [ -e /vagrant/pg_hba.sed ]; then
+	if ! sudo grep -q map=solarnet /etc/postgresql/$PGVER/main/pg_hba.conf 2>/dev/null; then
+		echo -e '\nConfiguring Postgres SolarNetwork peer mapping...'
+		sudo sh -c "sed -f /vagrant/pg_hba.sed /etc/postgresql/$PGVER/main/pg_hba.conf > /etc/postgresql/$PGVER/main/pg_hba.conf.new"
+		sudo chown postgres:postgres /etc/postgresql/$PGVER/main/pg_hba.conf.new
+		sudo chmod 640 /etc/postgresql/$PGVER/main/pg_hba.conf.new
+		sudo mv /etc/postgresql/$PGVER/main/pg_hba.conf /etc/postgresql/$PGVER/main/pg_hba.conf.bak
+		sudo mv /etc/postgresql/$PGVER/main/pg_hba.conf.new /etc/postgresql/$PGVER/main/pg_hba.conf
+		sudo service postgresql restart
+	fi
 fi
 
-sudo -u postgres sh -c "psql -d solarnetwork -c 'SELECT now()'" >/dev/null 2>&1
-if [ $? -ne 0 ]; then
+if ! sudo -u postgres sh -c "psql -d solarnetwork -c 'SELECT now()'" >/dev/null 2>&1; then
 	echo -e '\nCreating SolarNetwork Postgres database...'
 	sudo -u postgres createuser -AD solarnet
 	sudo -u postgres psql -U postgres -d postgres -c "alter user solarnet with password 'solarnet';"
@@ -143,10 +172,11 @@ if [ $? -ne 0 ]; then
 	sudo -u postgres psql -U postgres -d solarnetwork -c 'CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public'
 	sudo -u postgres psql -U postgres -d solarnetwork -c 'CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public'
 	sudo -u postgres psql -U postgres -d solarnetwork -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public'
+	sudo -u postgres psql -U postgres -d solarnetwork -c 'CREATE EXTENSION IF NOT EXISTS timescaledb WITH SCHEMA public'
+	sudo -u postgres psql -U postgres -d solarnetwork -c 'CREATE EXTENSION IF NOT EXISTS aggs_for_vecs WITH SCHEMA public'
 fi
 
-sudo -u postgres sh -c "psql -d solarnet_unittest -c 'SELECT now()'" >/dev/null 2>&1
-if [ $? -ne 0 ]; then
+if ! sudo -u postgres sh -c "psql -d solarnet_unittest -c 'SELECT now()'" >/dev/null 2>&1; then
 	echo -e '\nCreating SolarNetwork unit test Postgres database...'
 	sudo -u postgres createuser -AD solarnet_test
 	sudo -u postgres psql -U postgres -d postgres -c "alter user solarnet_test with password 'solarnet_test';"
@@ -154,6 +184,8 @@ if [ $? -ne 0 ]; then
 	sudo -u postgres psql -U postgres -d solarnet_unittest -c 'CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public'
 	sudo -u postgres psql -U postgres -d solarnet_unittest -c 'CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public'
 	sudo -u postgres psql -U postgres -d solarnet_unittest -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public'
+	sudo -u postgres psql -U postgres -d solarnet_unittest -c 'CREATE EXTENSION IF NOT EXISTS timescaledb WITH SCHEMA public'
+	sudo -u postgres psql -U postgres -d solarnet_unittest -c 'CREATE EXTENSION IF NOT EXISTS aggs_for_vecs WITH SCHEMA public'
 fi
 
 if [ ! -e /etc/sudoers.d/solardev -a -e /vagrant/solardev.sudoers ]; then

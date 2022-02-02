@@ -27,6 +27,8 @@ createdb -E UNICODE -l C -T template0 -O "$DB_OWNER" "$DB"
 psql -U postgres -d "$DB" -c 'CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public'
 psql -U postgres -d "$DB" -c 'CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public'
 psql -U postgres -d "$DB" -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public'
+psql -U postgres -d "$DB" -c 'CREATE EXTENSION IF NOT EXISTS timescaledb WITH SCHEMA public'
+psql -U postgres -d "$DB" -c 'CREATE EXTENSION IF NOT EXISTS aggs_for_vecs WITH SCHEMA public'
 
 # Setup base database
 cd $WORKSPACE/solarnetwork-central/solarnet-db-setup/postgres
