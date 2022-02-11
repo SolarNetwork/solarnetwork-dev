@@ -67,7 +67,7 @@ The default installation uses a minimal fluxbox desktop environment and limited 
 |java_version|8|the version of java to install|
 |git_branch|develop|the git branch to checkout|
 |git_repos|build external common central node|the SolarNetwork repos to checkout|
-|desktop_packages|xorg xserver-xorg-legacy xserver-xorg-video-vesa xserver-xorg-video-vmware xfonts-scalable fluxbox eterm xfonts-terminus virtualbox-guest-dkms virtualbox-guest-additions-iso virtualbox-guest-x11 pgadmin3 xterm|can be used to override fluxbox as the desktop|
+|desktop_packages|xorg xserver-xorg-legacy xserver-xorg-video-vesa xserver-xorg-video-vmware xfonts-scalable fluxbox eterm xfonts-terminus virtualbox-guest-dkms virtualbox-guest-additions-iso virtualbox-guest-x11 pgadmin4-desktop xterm|can be used to override fluxbox as the desktop|
 
 You can change `git_repos` to include SolarDRAS by adding ` dras` to the default value.
 
