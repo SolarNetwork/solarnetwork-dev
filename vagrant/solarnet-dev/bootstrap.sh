@@ -1,16 +1,33 @@
 #!/bin/bash -e
 
-JAVAVER=$1
-PGVER=$2
-HOST=$3
-GIT_BRANCH=$4
-GIT_REPOS=$5
-DESKTOP_PACKAGES=$6
+JAVAVER="11"
+JAVANETVER="17"
+PGVER="12"
+HOST="solarnetworkdev.net"
+GIT_BRANCH="develop"
+GIT_REPOS="build external common central node"
+DESKTOP_PACKAGES=""
 
 GIT_HOME="/home/solardev/git"
 WORKSPACE="/home/solardev/workspace"
 DEB_RELEASE="${DEB_RELEASE:-bullseye}"
 PG_PRELOAD_LIB="${PG_PRELOAD_LIB:-auto_explain,pg_stat_statements,timescaledb}"
+
+while getopts ":b:h:j:J:p:r:U:" opt; do
+	case $opt in
+		b) GIT_BRANCH="${OPTARG}";;
+		h) HOST="${OPTARG}";;
+		j) JAVAVER="${OPTARG}";;
+		J) JAVANETVER="${OPTARG}";;
+		p) PGVER="${OPTARG}";;
+		r) GIT_REPOS="${OPTARG}";;
+		U) DESKTOP_PACKAGES="${OPTARG}";;
+		*)
+			echo "Unknown argument ${OPTARG}"
+			exit 1
+	esac
+done
+shift $(($OPTIND - 1))
 
 # Expand root
 sudo resize2fs /dev/sda1
@@ -74,45 +91,65 @@ if ! grep -q lfs ~/.gitconfig >/dev/null 2>/dev/null; then
 	git lfs install --skip-repo
 fi
 
-if [ -n "$DESKTOP_PACKAGES" ]; then
-	echo -e "\nInstalling Desktop Packages: $DESKTOP_PACKAGES"
-	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq $DESKTOP_PACKAGES
-fi
-
-echo -e "\nInstalling Postgres $PGVER and Java $JAVAVER..."
-javaPkg=openjdk-$JAVAVER-jdk
-if [ -z "$DESKTOP_PACKAGES" ]; then
-	javaPkg="${javaPkg}-headless"
-fi
-sudo DEBIAN_FRONTEND=noninteractive apt install -qy postgresql-$PGVER postgresql-contrib-$PGVER \
-  gnupg postgresql-common apt-transport-https lsb-release wget \
-  git git-flow $javaPkg librxtx-java
-  
 if [ -x /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh ]; then
 	sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
 fi
 
+doAptUpdate=""
+
 # Configure Timescale repo
 if [ ! -e /etc/apt/sources.list.d/timescaledb.list ]; then
+	echo "Adding TimescaleDB apt repo..."
 	sudo sh -c "echo 'deb https://packagecloud.io/timescale/timescaledb/ubuntu/ $(lsb_release -cs) main' > /etc/apt/sources.list.d/timescaledb.list"
-	sudo sh -c 'wget --quiet -O - https://packagecloud.io/timescale/timescaledb/gpgkey | apt-key add -'
-	sudo apt update
+	wget --quiet -O - https://packagecloud.io/timescale/timescaledb/gpgkey | sudo apt-key add -
+	doAptUpdate=1
 fi
 
 # Configure SNF repo
 if [ ! -e /etc/apt/sources.list.d/solarnetwork.list ]; then
+	echo "Adding SolarNetwork Foundation apt repo..."
 	sudo sh -c "echo 'deb https://debian.repo.solarnetwork.org.nz ${DEB_RELEASE} main' > /etc/apt/sources.list.d/solarnetwork.list"
-	sudo sh -c 'wget --quiet -O - https://debian.repo.solarnetwork.org.nz/KEY.gpg | apt-key add -'
-	sudo apt update
+	wget --quiet -O - https://debian.repo.solarnetwork.org.nz/KEY.gpg | sudo apt-key add -
+	doAptUpdate=1
 fi
 
 # Configure pgAdmin repo
 if [ ! -e /etc/apt/sources.list.d/pgadmin4.list ]; then
+	echo "Adding pgAdmin 4 apt repo..."
 	sudo sh -c "echo 'deb https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/$(lsb_release -cs) pgadmin4 main' > /etc/apt/sources.list.d/pgadmin4.list"
-	sudo sh -c 'wget --quiet -O - https://www.pgadmin.org/static/packages_pgadmin_org.pub | apt-key add -'
+	wget --quiet -O - https://www.pgadmin.org/static/packages_pgadmin_org.pub | sudo apt-key add -
+	doAptUpdate=1
+fi
+
+# Configure Postgres repo
+if [ ! -e /etc/apt/sources.list.d/pgdg.list ]; then
+	echo "Adding Postgres apt repo..."
+	sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+	wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+	doAptUpdate=1
+fi
+
+if [ -n $doAptUpdate ]; then
 	sudo apt update
 fi
 
+# Install desktop stuff
+if [ -n "$DESKTOP_PACKAGES" ]; then
+	echo -e "\nInstalling Desktop Packages: $DESKTOP_PACKAGES"
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy $DESKTOP_PACKAGES
+fi
+
+echo -e "\nInstalling Postgres $PGVER and Java $JAVAVER, $JAVANETVER..."
+javaPkg=openjdk-$JAVAVER-jdk
+javaNetPkg=openjdk-$JAVANETVER-jdk
+if [ -z "$DESKTOP_PACKAGES" ]; then
+	javaPkg="${javaPkg}-headless"
+	javaNetPkg="${javaNetPkg}-headless"
+fi
+sudo DEBIAN_FRONTEND=noninteractive apt install -qy postgresql-$PGVER postgresql-contrib-$PGVER \
+  gnupg postgresql-common apt-transport-https lsb-release wget \
+  git git-flow $javaPkg $javaNetPkg librxtx-java
+  
 sudo apt install -qy timescaledb-2-postgresql-$PGVER postgresql-$PGVER-aggs-for-vecs
 sudo apt autoremove -qy
 
@@ -203,17 +240,17 @@ fi
 
 # Check out the source code
 if [ -x /vagrant/bin/solardev-git.sh ]; then
-	sudo -i -u solardev /vagrant/bin/solardev-git.sh $GIT_HOME $GIT_BRANCH "$GIT_REPOS"
+	sudo -i -u solardev /vagrant/bin/solardev-git.sh -g "$GIT_HOME" -b "$GIT_BRANCH" -r "$GIT_REPOS"
 fi
 
 # Configure the linux installation
 if [ -x /vagrant/solardev.sh ]; then
-	sudo -i -u solardev /vagrant/solardev.sh $WORKSPACE $GIT_HOME
+	sudo -i -u solardev /vagrant/solardev.sh -w "$WORKSPACE" -g "$GIT_HOME"
 fi
 
 # Set up the eclipse workspace
 if [ -x /vagrant/bin/solardev-workspace.sh -a -x /usr/bin/X ]; then
-	sudo -i -u solardev /vagrant/bin/solardev-workspace.sh $WORKSPACE $GIT_HOME
+	sudo -i -u solardev /vagrant/bin/solardev-workspace.sh -w "$WORKSPACE" -g "$GIT_HOME"
 fi
 
 # Success messages

@@ -1,40 +1,51 @@
 #!/bin/bash
 # This script configures the Eclipse workspace
 #
-# Usage: ./solardev-workspace.sh <workspace> (<git location>)
+# Usage: ./solardev-workspace.sh -w <workspace> [-g <git location>]
 # if no git location is specified then the workspace will be used
 
-WORKSPACE=${1:-~/workspace}
-GIT_HOME=${2:-~/git}
-SCRIPT_HOME=${3:-/vagrant}
+GIT_HOME="$HOME/git"
+SCRIPT_HOME="/vagrant"
+WORKSPACE="$HOME/workspace"
+
+while getopts ":g:w:" opt; do
+	case $opt in
+		g) GIT_HOME="${OPTARG}";;
+		w) WORKSPACE="${OPTARG}";;
+		*)
+			echo "Unknown argument ${OPTARG}"
+			exit 1
+	esac
+done
+shift $(($OPTIND - 1))
 
 # Make sure that a workspace has been specified
 if [ -z "$WORKSPACE" ]; then
-  echo "Usage: ./solardev-workspace.sh <workspace> (<git location>)"
+  echo "Usage: ./solardev-workspace.sh -w <workspace> [-g <git location>]"
   exit 1
 fi
 if [ -z "$GIT_HOME" ]; then
   echo "No Git directory specified, defaulting to using workspace: $WORKSPACE"
-  GIT_HOME=$WORKSPACE
+  GIT_HOME="$WORKSPACE"
 fi
 
-if [ ! -d $WORKSPACE ]; then
-  mkdir -p $WORKSPACE
+if [ ! -d "$WORKSPACE" ]; then
+  mkdir -p "$WORKSPACE"
 fi
 
 echo "Configuring SolarNetwork workspace: $WORKSPACE"
 
 # Setup Eclipse
-if [ ! -d  $WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings ]; then
-  mkdir -p $WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings
+if [ ! -d  "$WORKSPACE"/.metadata/.plugins/org.eclipse.core.runtime/.settings ]; then
+  mkdir -p "$WORKSPACE"/.metadata/.plugins/org.eclipse.core.runtime/.settings
 fi
 
 # Add Git repos to Eclipse configuration
 # Make sure that the selected GIT_HOME is used by egit in eclipse
 # This allows us to generate multiple workspaces with independent source
-if [ ! -e $WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.egit.core.prefs ]; then
+if [ ! -e "$WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.egit.core.prefs" ]; then
   echo -e '\nConfiguring SolarNetwork git repositories in Eclipse...'
-  cat > $WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.egit.core.prefs <<EOF
+  cat > "$WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.egit.core.prefs" <<EOF
 GitRepositoriesView.GitDirectories=$GIT_HOME/solarnetwork-central/.git\:$GIT_HOME/solarnetwork-common/.git\:$GIT_HOME/solarnetwork-node/.git\:$GIT_HOME/solarnetwork-build/.git\:$GIT_HOME/solarnetwork-external/.git\:
 RepositorySearchDialogSearchPath=$GIT_HOME
 eclipse.preferences.version=1
@@ -43,27 +54,27 @@ EOF
 fi
 
 # Add SolarNetwork target platform configuration
-if [ ! -e $WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.pde.core.prefs ]; then
+if [ ! -e "$WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.pde.core.prefs" ]; then
   echo -e '\nConfiguring SolarNetwork Eclipse PDE target platform...'
-  cat > $WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.pde.core.prefs <<EOF
+  cat > "$WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.pde.core.prefs" <<EOF
 eclipse.preferences.version=1
 workspace_target_handle=resource\:/solarnetwork-osgi-target/defs/solarnetwork-gemini.target
 EOF
 fi
 
 # Add SolarNetwork debug launch configuration to Eclipse
-LAUNCH_FILE="$SCRIPT_HOME/eclipse/SolarNetwork.launch"
-if [ ! -e $WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches/SolarNetwork.launch -a -e $LAUNCH_FILE ]; then
-  echo -e '\nCreating SolarNetwork Eclipse launch configuration...'
-  if [ ! -d $WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches ]; then
-    mkdir -p $WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches
+LAUNCH_FILE="$SCRIPT_HOME/eclipse/SolarNode.launch"
+if [ ! -e "$WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches/SolarNode.launch" -a -e "$LAUNCH_FILE" ]; then
+  echo -e '\nCreating SolarNode Eclipse launch configuration...'
+  if [ ! -d "$WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches" ]; then
+    mkdir -p "$WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches"
   fi
   # turn project dir list of *.test projects into comma-delimited list of names
   excludeProjectNames=$(find $GIT_HOME/*/* -type d -prune -name '*.test' -print |awk -F/ '{print $NF}' |tr '\n' ',')
   # have to treat the "external" projects differently, because folder names do not include ".external" part of project name
   excludeExternalProjectNames=$(find $GIT_HOME/solarnetwork-external/* -type d -prune -name '*.test' -print \
   	|awk -F/ '{gsub("net.solarnetwork","net.solarnetwork.external",$NF); print $NF}' |tr '\n' ',' |sed 's/,$//')
-  sed "s/__IGNORE_LAUNCH__/$excludeProjectNames$excludeExternalProjectNames/" $LAUNCH_FILE >$WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches/SolarNetwork.launch 
+  sed "s/__IGNORE_LAUNCH__/$excludeProjectNames$excludeExternalProjectNames/" "$LAUNCH_FILE" >"$WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches/SolarNode.launch" 
 fi
 
 # Configure SolarNetwork toString() format template
@@ -146,24 +157,6 @@ EOF
 skipProjects=("solarnetwork-build/archiva-obr-plugin" \
   "solarnetwork-build/bundle-helper" \
   "solarnetwork-build/net.solarnetwork.pki.sun.security" \
-  "solarnetwork-central/net.solarnetwork.central.common.mail.javamail" \
-  "solarnetwork-central/net.solarnetwork.central.common.mail.javamail.test" \
-  "solarnetwork-central/net.solarnetwork.central.in.mqtt" \
-  "solarnetwork-central/net.solarnetwork.central.in.mqtt.test" \
-  "solarnetwork-central/net.solarnetwork.central.in.ocpp.json" \
-  "solarnetwork-central/net.solarnetwork.central.in.ocpp.mqtt" \
-  "solarnetwork-central/net.solarnetwork.central.in.ocpp.mqtt.test" \
-  "solarnetwork-central/net.solarnetwork.central.user.billing.aop" \
-  "solarnetwork-central/net.solarnetwork.central.user.billing.biz.dao" \
-  "solarnetwork-central/net.solarnetwork.central.user.billing.biz.dao.test" \
-  "solarnetwork-central/net.solarnetwork.central.user.billing.killbill" \
-  "solarnetwork-central/net.solarnetwork.central.user.billing.killbill.jobs" \
-  "solarnetwork-central/net.solarnetwork.central.user.billing.killbill.jobs.test" \
-  "solarnetwork-central/net.solarnetwork.central.user.billing.killbill.test" \
-  "solarnetwork-central/net.solarnetwork.central.user.nim.cloud" \
-  "solarnetwork-central/net.solarnetwork.central.user.nim.jobs" \
-  "solarnetwork-central/net.solarnetwork.central.user.pki.dogtag" \
-  "solarnetwork-central/net.solarnetwork.central.user.pki.dogtag.test" \
   "solarnetwork-common/net.solarnetwork.pidfile" \
   "solarnetwork-external/aws-s3-osgi" \
   "solarnetwork-node/net.solarnetwork.node.config" \

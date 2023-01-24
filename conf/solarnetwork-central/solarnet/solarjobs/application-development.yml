@@ -1,0 +1,32 @@
+logging:
+  level:
+    net.solarnetwork.central: DEBUG
+
+app:
+  datum:
+    import:
+      s3-storage:
+        objectKeyPrefix: "datum-import/"
+        s3Client:
+          bucketName: "solarnetwork-dev-testing"
+          regionName: "us-west-2"
+          accessToken: "TOKEN"
+          accessSecret: "SECRET"
+  solarflux:
+    connection:
+      uid: "SolarFlux-Datum-Publisher-01"
+      mqtt-stats.log-frequency: 20
+      mqtt-config:
+        server-uri: "mqtt://vernemq-flux:1883"
+        client-id: "solarnet"
+        username: "solarnet"
+        password: "solarnet"
+  job:
+    datum:
+      export:
+        processor:
+          maximum-iterations: 1000
+          maximum-wait-ms: 300000
+          schedule: "8 1/2 * * * *"
+  scheduler-manager:
+    blocked-job-max-seconds: 80

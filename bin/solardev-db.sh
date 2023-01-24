@@ -1,9 +1,22 @@
 #!/bin/bash
 # Sets up the SolarNetwork PostgreSQL DB
 
-WORKSPACE="$1"
-DB="${2:-solarnetwork}"
-DB_OWNER="${3:-solarnet}"
+WORKSPACE=""
+DB="solarnetwork"
+DB_OWNER="solarnet"
+
+while getopts ":D:g:O:w:" opt; do
+	case $opt in
+		D) DB="${OPTARG}";;
+		g) GIT_HOME="${OPTARG}";;
+		O) DB_OWNER="${OPTARG}";;
+		w) WORKSPACE="${OPTARG}";;
+		*)
+			echo "Unknown argument ${OPTARG}"
+			exit 1
+	esac
+done
+shift $(($OPTIND - 1))
 
 # Make sure that a workspace has been specified
 if [ -z "$WORKSPACE" ]; then
@@ -34,13 +47,3 @@ psql -U postgres -d "$DB" -c 'CREATE EXTENSION IF NOT EXISTS aggs_for_vecs WITH 
 cd $WORKSPACE/solarnetwork-central/solarnet-db-setup/postgres
 
 psql -d "$DB" -U "$DB_OWNER" -f postgres-init.sql
-
-# DRAS extensions
-if [ -d "$WORKSPACE/solarnetwork-dras" ]; then
-  echo "Installing DRAS extensions"
-
-  cd $WORKSPACE/solarnetwork-dras/net.solarnetwork.central.dras/defs/sql/postgres
-
-  psql -d "$DB" -U "$DB_OWNER" -f dras-reboot.sql
-  psql -d "$DB" -U "$DB_OWNER" -c "ALTER ROLE $DB_OWNER SET intervalstyle = 'iso_8601'"
-fi
