@@ -1,0 +1,64 @@
+logging:
+  level:
+    net.solarnetwork.central: "DEBUG"
+
+app:
+  datasource:
+    url: "jdbc:postgresql://localhost/solarnetwork"
+  network-identity:
+    host: "localhost"
+    port: 9083
+    force-tls: false
+    service-urls:
+      solarin: "https://solarnetworkdev.net:9483/solarin"
+      solarin-mqtt: "mqtts://queue.solarnetworkdev.net:8883"
+      solarquery: "http://localhost:9082/solarquery"
+      solaruser: "http://localhost:9081/solaruser"
+  node.pki.dogtag:
+    base-url: "https://ca.solarnetworkdev.net:8443"
+    keystore-resource: "file:../../../solarnetwork-build/solarnetwork-osgi-target/conf/tls/dogtag-client.jks"
+    keystore-password: "dev123"
+  solarflux:
+    connection:
+      uid: "SolarFlux-01"
+      publish-qos-level: 0
+      mqtt-stats.log-frequency: 200
+      mqtt-config:
+        server-uri: "mqtt://vernemq-flux:1883"
+        client-id: "solarin-datumpub-01"
+        username: "solarnet"
+        password: "solarnet"
+        wire-logging-enabled: true
+  solarin:
+    async-collector:
+      threads: 10
+      shutdown-wait-secs: 30
+      queue-size: 200
+      stat-frequency: 10
+      datum-cache-removal-alert-threshold: 1000
+  solarqueue:
+    connection:
+      uid: "SolarIn-01"
+      mqtt-stats.log-frequency: 200
+      mqtt-config:
+        server-uri: "mqtt://vernemq:1883"
+        client-id: "solarin-01"
+        username: "solarnet"
+        password: "solarnet"
+        clean-session: false
+        wire-logging-enabled: true
+
+server:
+  port: 9483
+  http:
+    port: 9083
+  ssl:
+    client-auth: "WANT"
+    key-store: "../../../solarnetwork-build/solarnetwork-osgi-target/conf/tls/central.jks"
+    key-store-type: "JKS"
+    key-store-password: "dev123"
+    key-alias: "web"
+    trust-store: "../../../solarnetwork-build/solarnetwork-osgi-target/conf/tls/central-trust.jks"
+    trust-store-type: "JKS"
+    trust-store-password: "dev123"
+  

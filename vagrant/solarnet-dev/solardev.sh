@@ -1,16 +1,27 @@
 #!/bin/bash
 
-WORKSPACE=$1
-GIT_HOME=$2
+GIT_HOME=""
+WORKSPACE=""
+
+while getopts ":g:w:" opt; do
+	case $opt in
+		g) GIT_HOME="${OPTARG}";;
+		w) WORKSPACE="${OPTARG}";;
+		*)
+			echo "Unknown argument ${OPTARG}"
+			exit 1
+	esac
+done
+shift $(($OPTIND - 1))
 
 # Make sure that a workspace has been specified
 if [ -z "$WORKSPACE" ]; then
-  echo "Usage: ./solardev.sh <workspace> (<git location>)"
+  echo "Usage: ./solardev.sh -w <workspace> [-g <git location>]"
   exit 1
 fi
 if [ -z "$GIT_HOME" ]; then
   echo "No Git directory specified, defaulting to using workspace: $WORKSPACE"
-  GIT_HOME=$WORKSPACE
+  GIT_HOME="$WORKSPACE"
 fi
 
 # Setup .xinitrc to launch Fluxbox
@@ -37,23 +48,23 @@ fi
 psql -d solarnetwork -U solarnet -c 'select count(*) from solarnet.sn_node' >/dev/null 2>&1
 if [ $? -ne 0 ]; then
 	echo -e '\nCreating solarnet database tables...'
-	cd $GIT_HOME/solarnetwork-central/solarnet-db-setup/postgres
+	cd "$GIT_HOME/solarnetwork-central/solarnet-db-setup/postgres"
 	psql -d solarnetwork -U solarnet -f postgres-init.sql
 fi
 
 # Setup unit test database
-psql -d solarnet_unittest -U solarnet_test -c 'select count(*) from solarnet.sn_node' >/dev/null 2>&1
+psql -d solarnetwork_unittest -U solartest -c 'select count(*) from solarnet.sn_node' >/dev/null 2>&1
 if [ $? -ne 0 ]; then
-	echo -e '\nCreating solarnet_unittest database tables...'
-	cd $GIT_HOME/solarnetwork-central/solarnet-db-setup/postgres
-	psql -d solarnet_unittest -U solarnet_test -f postgres-init.sql
+	echo -e '\nCreating solarnetwork_unittest database tables...'
+	cd "$GIT_HOME/solarnetwork-central/solarnet-db-setup/postgres"
+	psql -d solarnetwork_unittest -U solartest -f postgres-init.sql
 fi
 
-if [ -x /usr/bin/X ]; then
+if [ -x /usr/bin/X -a ! -x ~/eclipse/eclipse ]; then
 	eclipseDownload=/var/tmp/eclipse.tgz
-	eclipseName=2019-06
-	eclipseDownloadURL='http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/2019-06/R/eclipse-jee-2019-06-R-linux-gtk-x86_64.tar.gz&r=1'
-	eclipseDownloadSHA512=fde7854557b8359d8a842d84d0bc5ad297316b5a897081c100bd4645568c75dbd5b2646883b90ef0f88ed332de92af8221a6dfe68f36241d590b32cefd821631
+	eclipseName=2022-12
+	eclipseDownloadURL='https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/2022-12/R/eclipse-jee-2022-12-R-linux-gtk-x86_64.tar.gz&r=1'
+	eclipseDownloadSHA512=e798bd61539afaf287b7bdaf1c8ab2f4198a32483529a2ea312b634ed7da2d31f9c8fd1e8be3533f65cbf080473a0bb4842109a985d3abedc8dd1432e3be9eb5
 	eclipseDownloadHash=
 
 	eclipseHashFile () {
@@ -96,8 +107,8 @@ if [ -x /usr/bin/fluxbox -a ! -e ~/.fluxbox/menu ]; then
 	cat > ~/.fluxbox/menu <<EOF
 [begin] (SolarNetwork Dev)
         [exec] (Eclipse) { ~/eclipse/eclipse -data $WORKSPACE } <~/eclipse/icon.xpm>
-        [exec] (Firefox) { firefox } </usr/share/pixmaps/firefox.png>
-        [exec] (pgAdminIII) { pgadmin3 } </usr/share/pixmaps/pgadmin3.xpm>
+        [exec] (Firefox) { firefox } </usr/share/icons/hicolor/16x16/apps/firefox.png>
+        [exec] (pgAdmin4) { /usr/pgadmin4/bin/pgadmin4 } </usr/share/icons/hicolor/16x16/apps/pgadmin4.png>
         [submenu] (Shells) {}
                 [exec] (Bash) { x-terminal-emulator -T "Bash" -e /bin/bash --login} <>
                 [exec] (Dash) { x-terminal-emulator -T "Dash" -e /bin/dash -i} <>
