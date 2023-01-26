@@ -31,8 +31,8 @@ type -P psql &>/dev/null && echo "Configuring postgres"  || { echo "$psql comman
 #dropdb solarnetwork
 #dropuser solarnet
 
-#dropdb solarnet_unittest
-#dropuser solarnet_test
+#dropdb solarnetwork_unittest
+#dropuser solartest
 
 createuser -AD "$DB_OWNER"
 psql -U postgres -d postgres -c "ALTER ROLE $DB_OWNER WITH PASSWORD '$DB_OWNER'"
