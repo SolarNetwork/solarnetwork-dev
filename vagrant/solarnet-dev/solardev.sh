@@ -53,14 +53,14 @@ if [ $? -ne 0 ]; then
 fi
 
 # Setup unit test database
-psql -d solarnet_unittest -U solarnet_test -c 'select count(*) from solarnet.sn_node' >/dev/null 2>&1
+psql -d solarnetwork_unittest -U solartest -c 'select count(*) from solarnet.sn_node' >/dev/null 2>&1
 if [ $? -ne 0 ]; then
-	echo -e '\nCreating solarnet_unittest database tables...'
+	echo -e '\nCreating solarnetwork_unittest database tables...'
 	cd "$GIT_HOME/solarnetwork-central/solarnet-db-setup/postgres"
-	psql -d solarnet_unittest -U solarnet_test -f postgres-init.sql
+	psql -d solarnetwork_unittest -U solartest -f postgres-init.sql
 fi
 
-if [ -x /usr/bin/X ]; then
+if [ -x /usr/bin/X -a ! -x ~/eclipse/eclipse ]; then
 	eclipseDownload=/var/tmp/eclipse.tgz
 	eclipseName=2022-12
 	eclipseDownloadURL='https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/2022-12/R/eclipse-jee-2022-12-R-linux-gtk-x86_64.tar.gz&r=1'

@@ -58,7 +58,7 @@ if [ ! -e "$WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.
   echo -e '\nConfiguring SolarNetwork Eclipse PDE target platform...'
   cat > "$WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.pde.core.prefs" <<EOF
 eclipse.preferences.version=1
-workspace_target_handle=resource\:/solarnetwork-osgi-target/defs/solarnetwork-gemini.target
+workspace_target_handle=resource\:/solarnetwork-osgi-target/defs/solarnode-gemini.target
 EOF
 fi
 
@@ -75,6 +75,26 @@ if [ ! -e "$WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches/SolarN
   excludeExternalProjectNames=$(find $GIT_HOME/solarnetwork-external/* -type d -prune -name '*.test' -print \
   	|awk -F/ '{gsub("net.solarnetwork","net.solarnetwork.external",$NF); print $NF}' |tr '\n' ',' |sed 's/,$//')
   sed "s/__IGNORE_LAUNCH__/$excludeProjectNames$excludeExternalProjectNames/" "$LAUNCH_FILE" >"$WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches/SolarNode.launch" 
+fi
+
+for launchName in SolarInApp SolarJobsApp SolarQueryApp SolarUserApp; do
+	LAUNCH_FILE="$SCRIPT_HOME/eclipse/$launchName.launch"
+	if [ ! -e "$WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches/$launchName.launch" -a -e "$LAUNCH_FILE" ]; then
+  		echo -e "\nCreating $launchName Eclipse launch configuration..."
+		if [ ! -d "$WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches" ]; then
+			mkdir -p "$WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches"
+		fi
+		cp "$LAUNCH_FILE" "$WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches/$launchName.launch"
+	fi
+done
+
+# Configure workspace JREs
+if [ ! -e "$WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.jdt.launching.prefs" ]; then
+  echo -e '\nCreating Eclipse JRE configuration...'
+  if [ ! -d "$WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings" ]; then
+    mkdir -p "$WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings"
+  fi
+  cp "$SCRIPT_HOME/eclipse/org.eclipse.core.runtime/org.eclipse.jdt.launching.prefs" "$WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.jdt.launching.prefs"
 fi
 
 # Configure SolarNetwork toString() format template

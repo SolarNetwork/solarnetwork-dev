@@ -37,6 +37,8 @@ if [ ! -d "$GIT_HOME" ]; then
   mkdir -p "$GIT_HOME"
 fi
 
+startDir="$(pwd)"
+
 echo "Checking out SolarNetwork branch $GIT_BRANCH sources to: $GIT_HOME"
 
 # Checkout SolarNetwork sources
@@ -67,34 +69,13 @@ if [ ! -d "$GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/config" ]; then
 		> "$GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/config/tomcat-server.xml"
 fi
 
-if [ ! -e "$GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/configurations/services/net.solarnetwork.jdbc.pool.hikari-central.cfg" ]; then
-	echo -e '\nCreating JDBC configuration...'
-	cat > "$GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/configurations/services/net.solarnetwork.jdbc.pool.hikari-central.cfg" <<-EOF
-		service.factoryPid = net.solarnetwork.jdbc.pool.hikari
-		serviceProperty.db = central
-		dataSourceFactory.filter = (osgi.jdbc.driver.class=org.postgresql.Driver)
-		dataSource.url = jdbc:postgresql://localhost:5432/solarnetwork
-		dataSource.user = solarnet
-		dataSource.password = solarnet
-		pingTest.query = SELECT CURRENT_TIMESTAMP
-		minimumIdle = 1
-		maximumPoolSize = 10
-EOF
-fi
-
-# copy conf files; skipping any that already exist
-if [ -d conf/solarnetwork-central/solarnet -a -d "$GIT_HOME/solarnetwork-central/solarnet" ]; then
-	echo -e '\nCreating initial SolarNet configuration...'
-	cp -anv conf/solarnetwork-central/solarnet "$GIT_HOME/solarnetwork-central/"
-fi
-
 if [ ! -d "$GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/conf/tls" ]; then
 	echo -e '\nCreating conf/tls directory...'
 	mkdir -p "$GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/conf/tls"
 	if cd "$GIT_HOME/solarnetwork-build/solarnetwork-osgi-target/conf/tls"; then
-		ln -s ../../var/DeveloperCA/central.jks
-		ln -s ../../var/DeveloperCA/central-trust.jks
-		ln -s ../../var/DeveloperCA/central-trust.jks trust.jks
+		ln -s ../../../../solarnetwork-central/solarnet/solaruser/var/DeveloperCA/central.jks
+		ln -s ../../../../solarnetwork-central/solarnet/solaruser/var/DeveloperCA/central-trust.jks
+		ln -s ../../../../solarnetwork-central/solarnet/solaruser/var/DeveloperCA/central-trust.jks trust.jks
 	fi
 fi
 
@@ -119,7 +100,7 @@ fi
 
 if [ ! -e "$GIT_HOME/solarnetwork-common/net.solarnetwork.common.test/environment/local/log4j2-test.xml" ]; then
 	echo -e '\nCreating common unit test logging configuration...'
-	cp "$GIT_HOME/solarnetwork-common/net.solarnetwork.common.test/environment/local/log4j2-test.xml" \
+	cp "$GIT_HOME/solarnetwork-common/net.solarnetwork.common.test/environment/example/log4j2-test.xml" \
 		"$GIT_HOME/solarnetwork-common/net.solarnetwork.common.test/environment/local/"
 fi
 

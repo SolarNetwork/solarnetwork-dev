@@ -3,11 +3,14 @@ logging:
     net.solarnetwork.central: "DEBUG"
 
 app:
+  datasource:
+    url: "jdbc:postgresql://localhost/solarnetwork"
   network-identity:
     host: "localhost"
     port: 9083
     force-tls: false
     service-urls:
+      solarin: "https://solarnetworkdev.net:9483/solarin"
       solarin-mqtt: "mqtts://queue.solarnetworkdev.net:8883"
       solarquery: "http://localhost:9082/solarquery"
       solaruser: "http://localhost:9081/solaruser"

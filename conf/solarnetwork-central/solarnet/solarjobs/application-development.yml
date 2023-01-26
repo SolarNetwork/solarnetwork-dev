@@ -3,6 +3,8 @@ logging:
     net.solarnetwork.central: DEBUG
 
 app:
+  datasource:
+    url: "jdbc:postgresql://localhost/solarnetwork"
   datum:
     import:
       s3-storage:

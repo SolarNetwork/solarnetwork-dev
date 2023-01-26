@@ -1,7 +1,6 @@
 #!/bin/bash -e
 
-JAVAVER="11"
-JAVANETVER="17"
+JAVAVER="8 11 17"
 PGVER="12"
 HOST="solarnetworkdev.net"
 GIT_BRANCH="develop"
@@ -18,7 +17,6 @@ while getopts ":b:h:j:J:p:r:U:" opt; do
 		b) GIT_BRANCH="${OPTARG}";;
 		h) HOST="${OPTARG}";;
 		j) JAVAVER="${OPTARG}";;
-		J) JAVANETVER="${OPTARG}";;
 		p) PGVER="${OPTARG}";;
 		r) GIT_REPOS="${OPTARG}";;
 		U) DESKTOP_PACKAGES="${OPTARG}";;
@@ -139,18 +137,27 @@ if [ -n "$DESKTOP_PACKAGES" ]; then
 	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy $DESKTOP_PACKAGES
 fi
 
-echo -e "\nInstalling Postgres $PGVER and Java $JAVAVER, $JAVANETVER..."
-javaPkg=openjdk-$JAVAVER-jdk
-javaNetPkg=openjdk-$JAVANETVER-jdk
-if [ -z "$DESKTOP_PACKAGES" ]; then
-	javaPkg="${javaPkg}-headless"
-	javaNetPkg="${javaNetPkg}-headless"
-fi
-sudo DEBIAN_FRONTEND=noninteractive apt install -qy postgresql-$PGVER postgresql-contrib-$PGVER \
-  gnupg postgresql-common apt-transport-https lsb-release wget \
-  git git-flow $javaPkg $javaNetPkg librxtx-java
+for v in $JAVAVER; do
+	echo -e "\nInstalling Java $v..."
+	javaPkg=openjdk-$v-jdk
+	if [ -z "$DESKTOP_PACKAGES" ]; then
+		javaPkg="${javaPkg}-headless"
+	fi
+	sudo DEBIAN_FRONTEND=noninteractive apt install -qy $javaPkg
+done
   
+echo -e "\nInstalling supporting utilities..."
+sudo DEBIAN_FRONTEND=noninteractive apt install -qy gnupg apt-transport-https lsb-release wget \
+  git git-flow
+  
+echo -e "\nInstalling Postgres $PGVER..."
+sudo DEBIAN_FRONTEND=noninteractive apt install -qy postgresql-$PGVER postgresql-contrib-$PGVER \
+  postgresql-common
+
+echo -e '\nInstalling Postgres extensions...'
 sudo apt install -qy timescaledb-2-postgresql-$PGVER postgresql-$PGVER-aggs-for-vecs
+
+echo -e '\nCleaning up unused packages...'
 sudo apt autoremove -qy
 
 if ! grep -q 'jit = on' /etc/postgresql/$PGVER/main/postgresql.conf 2>/dev/null; then
@@ -163,13 +170,6 @@ if [ -n "$DESKTOP_PACKAGES" ]; then
 	echo -e '\nInstalling web browsers...'
 	# Note libwebkitgtk is required for Eclipse to support an internal browser
 	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy firefox libwebkit2gtk-4.0-37
-fi
-
-if [ -e /usr/share/java/RXTXcomm.jar -a -d /usr/lib/jvm/java-$JAVAVER-openjdk-i386/jre/lib/ext \
-		-a ! -e /usr/lib/jvm/java-$JAVAVER-openjdk-i386/jre/lib/ext/RXTXcomm.jar ]; then
-	echo -e '\nLinking RXTX JAR to JRE...'
-	sudo ln -s /usr/share/java/RXTXcomm.jar \
-		/usr/lib/jvm/java-$JAVAVER-openjdk-i386/jre/lib/ext/RXTXcomm.jar
 fi
 
 # Add the solardev user if it doesn't already exist, password solardev
@@ -192,7 +192,7 @@ fi
 if ! sudo grep -q solarnet /etc/postgresql/$PGVER/main/pg_ident.conf 2>/dev/null; then
 	echo -e '\nConfiguring Postgres solardev user mapping...'
 	sudo sh -c "echo \"solarnet solardev solarnet\" >> /etc/postgresql/$PGVER/main/pg_ident.conf"
-	sudo sh -c "echo \"solartest solardev solarnet_test\" >> /etc/postgresql/$PGVER/main/pg_ident.conf"
+	sudo sh -c "echo \"solartest solardev solartest\" >> /etc/postgresql/$PGVER/main/pg_ident.conf"
 	sudo service postgresql restart
 fi
 
@@ -220,16 +220,16 @@ if ! sudo -u postgres sh -c "psql -d solarnetwork -c 'SELECT now()'" >/dev/null 
 	sudo -u postgres psql -U postgres -d solarnetwork -c 'CREATE EXTENSION IF NOT EXISTS aggs_for_vecs WITH SCHEMA public'
 fi
 
-if ! sudo -u postgres sh -c "psql -d solarnet_unittest -c 'SELECT now()'" >/dev/null 2>&1; then
+if ! sudo -u postgres sh -c "psql -d solarnetwork_unittest -c 'SELECT now()'" >/dev/null 2>&1; then
 	echo -e '\nCreating SolarNetwork unit test Postgres database...'
-	sudo -u postgres createuser -AD solarnet_test
-	sudo -u postgres psql -U postgres -d postgres -c "alter user solarnet_test with password 'solarnet_test';"
-	sudo -u postgres createdb -E UNICODE -l C -T template0 -O solarnet_test solarnet_unittest
-	sudo -u postgres psql -U postgres -d solarnet_unittest -c 'CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public'
-	sudo -u postgres psql -U postgres -d solarnet_unittest -c 'CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public'
-	sudo -u postgres psql -U postgres -d solarnet_unittest -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public'
-	sudo -u postgres psql -U postgres -d solarnet_unittest -c 'CREATE EXTENSION IF NOT EXISTS timescaledb WITH SCHEMA public'
-	sudo -u postgres psql -U postgres -d solarnet_unittest -c 'CREATE EXTENSION IF NOT EXISTS aggs_for_vecs WITH SCHEMA public'
+	sudo -u postgres createuser -AD solartest
+	sudo -u postgres psql -U postgres -d postgres -c "alter user solartest with password 'solartest';"
+	sudo -u postgres createdb -E UNICODE -l C -T template0 -O solartest solarnetwork_unittest
+	sudo -u postgres psql -U postgres -d solarnetwork_unittest -c 'CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public'
+	sudo -u postgres psql -U postgres -d solarnetwork_unittest -c 'CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public'
+	sudo -u postgres psql -U postgres -d solarnetwork_unittest -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public'
+	sudo -u postgres psql -U postgres -d solarnetwork_unittest -c 'CREATE EXTENSION IF NOT EXISTS timescaledb WITH SCHEMA public'
+	sudo -u postgres psql -U postgres -d solarnetwork_unittest -c 'CREATE EXTENSION IF NOT EXISTS aggs_for_vecs WITH SCHEMA public'
 fi
 
 if [ ! -e /etc/sudoers.d/solardev -a -e /vagrant/solardev.sudoers ]; then
@@ -253,42 +253,28 @@ if [ -x /vagrant/bin/solardev-workspace.sh -a -x /usr/bin/X ]; then
 	sudo -i -u solardev /vagrant/bin/solardev-workspace.sh -w "$WORKSPACE" -g "$GIT_HOME"
 fi
 
+# copy conf files; skipping any that already exist
+if [ -d /vagrant/conf/solarnetwork-central/solarnet -a -d "$GIT_HOME/solarnetwork-central/solarnet" ]; then
+	echo -e '\nCreating initial SolarNet configuration...'
+	sudo -i -u solardev cp -anv /vagrant/conf/solarnetwork-central/solarnet "$GIT_HOME/solarnetwork-central/"
+fi
+
 # Success messages
 if [ -x /usr/bin/fluxbox ]; then
 	cat <<"EOF"
 
 --------------------------------------------------------------------------------
-SolarNetwork development environment setup complete. Please reboot the
-virtual machine like:
+SolarNetwork development environment setup complete. Please reboot the virtual
+machine like:
 
 vagrant reload
 
-Then log into the VM as solardev:solardev and Eclipse will launch
-automatically. Right-click on the desktop to access a menu of other options.
+Then log into the VM as solardev:solardev and Eclipse will launch automatically.
+Right-click on the desktop to access a menu of other options.
 
-NOTE: If X fails to start via tty1, login on tty2 and run `startx` to
-start X and have Eclipse launch automatically.
+!! NOTE: If X fails to start on tty1, login on tty2 (Alt-F2) and run `startx`
+!! to start X and have Eclipse launch automatically.
 EOF
-elif [[ "$DESKTOP_PACKAGES" == *"virtualbox-guest-dkms"*  ]]; then
-  # if virtualbox-guest-dkms is included reconfigure so that the desktop will scale when resized
-  echo -e "\nReconfiguring virtualbox-guest-dkms\n"
-  sudo dpkg-reconfigure virtualbox-guest-dkms
-
-  cat <<EOF
-
---------------------------------------------------------------------------------
-SolarNetwork development environment setup complete, rebooting VM.
-
-Once restarted log into the VM as solardev:solardev.
-
-NOTE: If the desktop fails to auto scale first try rebooting the VM,
-if that doesn't work manually run : "sudo dpkg-reconfigure virtualbox-guest-dkms"
-then restart the VM.
-EOF
-
-  # Restart the VM to show the desktop
-  sudo reboot
-
 else
   cat <<EOF
 

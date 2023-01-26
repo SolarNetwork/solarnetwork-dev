@@ -3,6 +3,8 @@ logging:
     net.solarnetwork.central: "DEBUG"
 
 app:
+  datasource:
+    url: "jdbc:postgresql://localhost/solarnetwork"
   datum:
     import:
       s3-storage:
@@ -40,6 +42,10 @@ app:
         wire-logging-enabled: true
     instr-publish:
       publish-qos-level: 0
+  network-identity:
+    host: "solarnetworkdev.net"
+    port: 9483
+    force-tls: true
   node.pki.dogtag:
     base-url: "https://ca.solarnetworkdev.net:8443"
     keystore-resource: "file:../../../solarnetwork-build/solarnetwork-osgi-target/conf/tls/dogtag-client.jks"
