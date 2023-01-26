@@ -1,0 +1,66 @@
+logging:
+  level:
+    net.solarnetwork.central: "DEBUG"
+
+app:
+  datasource:
+    url: "jdbc:postgresql://localhost/solarnetwork"
+  datum:
+    import:
+      s3-storage:
+        objectKeyPrefix: "datum-import/"
+        s3Client:
+          bucketName: "solarnetwork-dev-testing"
+          regionName: "us-west-2"
+          accessToken: "TOKEN"
+          accessSecret: "SECRET"
+  secrets:
+    aws:
+      region: "us-west-2"
+      access-token: "TOKEN"
+      access-secret: "SECRET"
+  solarflux:
+    connection:
+      uid: "SolarFlux-01"
+      publish-qos-level: 0
+      mqtt-stats.log-frequency: 200
+      mqtt-config:
+        server-uri: "mqtt://vernemq-flux:1883"
+        client-id: "solaruser-datumpub-01"
+        username: "solarnet"
+        password: "solarnet"
+        wire-logging-enabled: true
+  solarqueue:
+    connection:
+      uid: "SolarInstr-01"
+      mqtt-stats.log-frequency: 200
+      mqtt-config:
+        server-uri: "mqtt://vernemq:1883"
+        client-id: "solarinstr"
+        username: "solarnet"
+        password: "solarnet"
+        wire-logging-enabled: true
+    instr-publish:
+      publish-qos-level: 0
+  network-identity:
+    host: "solarnetworkdev.net"
+    port: 9483
+    force-tls: true
+  node.pki.dogtag:
+    base-url: "https://ca.solarnetworkdev.net:8443"
+    keystore-resource: "file:../../../solarnetwork-build/solarnetwork-osgi-target/conf/tls/dogtag-client.jks"
+    keystore-password: "dev123"
+  user.reg:
+    biz:
+      network-certificate-subject-format: "UID=%s,O=SolarNetworkDev"
+      approve-csr-maximum-wait-secs: 30
+      node-certificate-renewal-period-months: 6
+  web.security:
+    token:
+      max-date-skew: 1200000
+
+server:
+  port: 9081
+  servlet:
+    session:
+      timeout: "60m"

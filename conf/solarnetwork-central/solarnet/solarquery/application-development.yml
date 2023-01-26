@@ -1,0 +1,7 @@
+logging:
+  level:
+    net.solarnetwork.central: DEBUG
+
+app:
+  datasource:
+    url: "jdbc:postgresql://localhost/solarnetwork"

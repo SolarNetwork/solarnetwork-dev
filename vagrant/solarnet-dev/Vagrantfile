@@ -8,7 +8,7 @@
 vm_define="solarnet"
 bootstrap_path="bootstrap.sh"
 vm_name="SolarNet Dev"
-basebox_name="ubuntu/focal64"
+basebox_name="ubuntu/jammy64"
 no_of_cpus=1
 memory_size=2048
 vm_gui=true
@@ -16,12 +16,11 @@ vm_gui=true
 git_branch="develop"
 git_repos="build external common central node"
 postgres_version=12
-java_version=8
+java_version="8 11 17"
+solarnet_host="solarnetworkdev.net"
 
 # Note xserver-xorg-legacy was only way I could find to get X to start as solardev on login from console
-desktop_packages="xorg xserver-xorg-legacy xserver-xorg-video-vesa xserver-xorg-video-vmware xfonts-scalable fluxbox eterm xfonts-terminus virtualbox-guest-dkms virtualbox-guest-additions-iso virtualbox-guest-x11 pgadmin4-desktop xterm --no-install-recommends"
-
-solarnet_host="solarnetworkdev.net"
+desktop_packages="xorg xserver-xorg-legacy xserver-xorg-video-vesa xserver-xorg-video-vmware xfonts-scalable fluxbox eterm xfonts-terminus virtualbox-guest-utils virtualbox-guest-x11 pgadmin4-desktop xterm --no-install-recommends"
 
 # Read any user specific configuration overrides - cater for this file not existing
 local_env_config_file="Vagrantfile.local"
@@ -80,6 +79,7 @@ Vagrant.configure(2) do |config|
   # argument is a set of non-required options.
   config.vm.synced_folder ".", "/vagrant", :mount_options => ["dmode=755"]
   config.vm.synced_folder "../../bin", "/vagrant/bin", :mount_options => ["dmode=755"]
+  config.vm.synced_folder "../../conf", "/vagrant/conf", :mount_options => ["dmode=755"]
   config.vm.synced_folder "../../eclipse", "/vagrant/eclipse", :mount_options => ["dmode=755"]
 
   # Provider-specific configuration so you can fine-tune various
@@ -97,25 +97,25 @@ Vagrant.configure(2) do |config|
     vb.name = vm_name
   end
 
-  # View the documentation for the provider you are using for more
-  # information on available options.
+  prov_args = [];
+  if !java_version.to_s.empty?
+    prov_args.push('-j', java_version.to_s)
+  end
+  if !postgres_version.to_s.empty?
+    prov_args.push('-p', postgres_version.to_s)
+  end
+  if !solarnet_host.empty?
+    prov_args.push('-h', solarnet_host)
+  end
+  if !git_branch.empty?
+    prov_args.push('-b',  git_branch)
+  end
+  if !git_repos.empty?
+    prov_args.push('-r', git_repos)
+  end
+  if vm_gui
+    prov_args.push('-U', desktop_packages)
+  end
 
-  # Define a Vagrant Push strategy for pushing to Atlas. Other push strategies
-  # such as FTP and Heroku are also available. See the documentation at
-  # https://docs.vagrantup.com/v2/push/atlas.html for more information.
-  # config.push.define "atlas" do |push|
-  #   push.app = "YOUR_ATLAS_USERNAME/YOUR_APPLICATION_NAME"
-  # end
-
-  # Enable provisioning with a shell script. Additional provisioners such as
-  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
-  # documentation for more information about their specific syntax and use.
-  config.vm.provision :shell, path: bootstrap_path, :args => [
-      java_version.to_s,
-      postgres_version.to_s,
-      solarnet_host,
-      git_branch,
-      git_repos,
-      (vm_gui ? desktop_packages : "")
-    ]
+  config.vm.provision :shell, path: bootstrap_path, :args => prov_args
 end
