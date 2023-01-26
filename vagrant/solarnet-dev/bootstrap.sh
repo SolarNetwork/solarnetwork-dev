@@ -238,6 +238,88 @@ if [ ! -e /etc/sudoers.d/solardev -a -e /vagrant/solardev.sudoers ]; then
 	sudo chmod 644 /etc/sudoers.d/solardev
 fi
 
+# Install VerneMQ
+if dpkg -s vernemq >/dev/null 2>/dev/null; then
+	echo -e "\nVerneMQ package already installed."
+else
+	vernemqVersion="1.12.6.2"
+	vernemqFilename="vernemq-${vernemqVersion}.jammy.x86_64.deb"
+	vernemqDownload="/var/tmp/${vernemqFilename}"
+	vernemqDownloadUrl="https://github.com/vernemq/vernemq/releases/download/${vernemqVersion}/${vernemqFilename}"
+	vernemqDownloadSha256="6ea7d50177d27fb9f69d8fc3e9c0e08d4a95308f1ead932721d187bea979bad5"
+	vernemqDownloadHash=""
+
+	vernemqHashFile () {
+		echo -e '\nVerifying VerneMQ download...'
+		vernemqDownloadHash=`sha256sum $vernemqDownload |cut -d' ' -f1`
+	}
+
+	if [ -e "$vernemqDownload" ]; then
+		vernemqHashFile
+	fi
+
+	if [ "$vernemqDownloadHash" != "$vernemqDownloadSha256" ]; then
+		echo -e "\nDownloading VernemMQ ($vernemqVersion)..."
+		curl -C - -L -s -S -o "$vernemqDownload" "$vernemqDownloadUrl"
+		if [ -e "$vernemqDownload" ]; then
+			vernemqHashFile
+		fi
+	fi
+	if [ -e "$vernemqDownload" ]; then
+		if [ "$vernemqDownloadHash" = "$vernemqDownloadSha256" ]; then
+			echo -e "\nInstalling VerneMQ ($vernemqVersion)..."
+			sudo apt-get -qy install "$vernemqDownload"
+			if [ $? -eq 0 ]; then
+				rm "$vernemqDownload"
+			fi
+		else
+			>&2 echo "Eclipse $vernemqVersion not completely downloaded, cannot install."
+		fi
+	fi
+fi
+
+# Make tweaks to VerneMQ default configuration
+if ! grep -q node /etc/vernemq/vmq.acl 2>/dev/null; then
+	echo -e '\nConfiguring Vernemq ACL...'
+	sudo cp /vagrant/conf/solarqueue/vmq.acl /etc/vernemq/vmq.acl
+fi
+if ! grep -q solarnet /etc/vernemq/vmq.passwd 2>/dev/null; then
+	echo -e '\nConfiguring Vernemq credentials...'
+	sudo cp /vagrant/conf/solarqueue/vmq.passwd /etc/vernemq/vmq.passwd
+	sudo vmq-passwd -U /etc/vernemq/vmq.passwd
+fi
+if [ ! -e /etc/vernemq/vernemq.conf.orig ]; then
+	echo -e '\nCreating backup of VerneMQ configuration...'
+	sudo cp -a /etc/vernemq/vernemq.conf /etc/vernemq/vernemq.conf.orig
+fi
+if grep -q 'accept_eula = no' /etc/vernemq/vernemq.conf; then
+	sudo sed -i 's/accept_eula = no/accept_eula = yes/' /etc/vernemq/vernemq.conf
+fi
+if grep -q '^allow_anonymous = off' /etc/vernemq/vernemq.conf; then
+	sudo sed -i 's/^allow_anonymous = off/allow_anonymous = on/' /etc/vernemq/vernemq.conf
+fi
+if grep -q '^listener.tcp.name' /etc/vernemq/vernemq.conf; then
+	sudo sed -i 's/^listener.tcp.name/#listener.tcp.name/' /etc/vernemq/vernemq.conf
+fi
+if grep -q '^listener.ssl.name' /etc/vernemq/vernemq.conf; then
+	sudo sed -i 's/^listener.ssl.name/#listener.ssl.name/' /etc/vernemq/vernemq.conf
+fi
+if [ ! -e /etc/vernemq/conf.d/solarnet.conf ]; then
+	echo -e '\nCreating SolarNet VerneMQ configuration...'
+	if [ ! -d /etc/vernemq/conf.d ]; then
+		sudo mkdir -p /etc/vernemq/conf.d
+	fi
+	sudo cp /vagrant/conf/solarqueue/solarnet.conf /etc/vernemq/conf.d/
+fi
+
+# Install Mosquitto client
+if dpkg -s mosquitto-clients 2>/dev/null; then
+	echo -e '\nMosquitto MQTT client already installed.'
+else
+	echo -e '\nInstalling Mosquitto MQTT client...'
+	sudo apt-get -qy install mosquitto-clients
+fi
+
 # Check out the source code
 if [ -x /vagrant/bin/solardev-git.sh ]; then
 	sudo -i -u solardev /vagrant/bin/solardev-git.sh -g "$GIT_HOME" -b "$GIT_BRANCH" -r "$GIT_REPOS"

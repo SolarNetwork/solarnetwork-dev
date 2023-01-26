@@ -41,7 +41,7 @@ app:
       uid: "SolarIn-01"
       mqtt-stats.log-frequency: 200
       mqtt-config:
-        server-uri: "mqtt://vernemq:1883"
+        server-uri: "mqtt://localhost:1883"
         client-id: "solarin-01"
         username: "solarnet"
         password: "solarnet"
