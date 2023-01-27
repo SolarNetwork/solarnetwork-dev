@@ -137,6 +137,11 @@ fi
 
 # Install desktop stuff
 if [ -n "$DESKTOP_PACKAGES" ]; then
+	if ! dpkg -s pgadmin4-desktop >/dev/null 2>/dev/null; then
+		echo -e "\nInstalling pgAdmin..."
+		sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy pgadmin4-desktop
+	fi
+	
 	echo -e "\nInstalling Desktop Packages: $DESKTOP_PACKAGES"
 	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy $DESKTOP_PACKAGES
 fi
