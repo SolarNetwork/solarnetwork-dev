@@ -13,5 +13,5 @@
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="net.solarnetwork.central.in.SolarInApp"/>
     <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="solarapp-in"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="solarapp-in"/>
-    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dspring.profiles.active=development"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dspring.profiles.active=development,mqtt,no-solarflux"/>
 </launchConfiguration>
