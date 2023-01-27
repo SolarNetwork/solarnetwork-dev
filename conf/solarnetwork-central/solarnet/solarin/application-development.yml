@@ -11,7 +11,7 @@ app:
     force-tls: false
     service-urls:
       solarin: "https://solarnetworkdev.net:9483/solarin"
-      solarin-mqtt: "mqtts://queue.solarnetworkdev.net:8883"
+      solarin-mqtt: "mqtt://localhost:1883"
       solarquery: "http://localhost:9082/solarquery"
       solaruser: "http://localhost:9081/solaruser"
   node.pki.dogtag:
