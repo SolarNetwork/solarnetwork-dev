@@ -1,0 +1,12 @@
+pattern write node/%c/datum
+pattern read node/%c/instr
+
+user admin
+topic #
+
+user solarnet
+topic #
+
+user solarinstr
+topic write node/+/instr
+topic write instr/+

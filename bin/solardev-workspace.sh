@@ -179,11 +179,14 @@ skipProjects=("solarnetwork-build/archiva-obr-plugin" \
   "solarnetwork-build/net.solarnetwork.pki.sun.security" \
   "solarnetwork-common/net.solarnetwork.pidfile" \
   "solarnetwork-external/aws-s3-osgi" \
+  "solarnetwork-external/net.solarnetwork.external.opendnp3-bindings" \
   "solarnetwork-node/net.solarnetwork.node.config" \
+  "solarnetwork-node/net.solarnetwork.node.io.dnp3" \
+  "solarnetwork-node/net.solarnetwork.node.io.dnp3.test" \
   "solarnetwork-node/net.solarnetwork.node.setup.developer" \
+  "solarnetwork-node/net.solarnetwork.node.setup.wifi" \
+  "solarnetwork-node/net.solarnetwork.node.setup.wifi.test" \
   "solarnetwork-node/net.solarnetwork.node.upload.mock" \
-  "solarnetwork-node/net.solarnetwork.node.upload.mqtt" \
-  "solarnetwork-node/net.solarnetwork.node.upload.mqtt.test" \
   "solarnetwork-node/net.solarnetwork.node.system.ssh" )
 # Generate Eclipse Team Project Set of all projects to import
 if [ ! -e $WORKSPACE/SolarNetworkTeamProjectSet.psf ]; then

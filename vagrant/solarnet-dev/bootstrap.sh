@@ -79,14 +79,18 @@ sudo apt-get update
 echo -e '\nUpgrading outdated packages...'
 sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -qy
 
-echo -e '\nInstalling language-pack...'
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy language-pack-en
+if ! dpkg -s language-pack-en >/dev/null 2>/dev/null; then
+	echo -e '\nInstalling language-pack...'
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy language-pack-en
+fi
 
-echo -e '\nInstalling git...'
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy git git-lfs
-if ! grep -q lfs ~/.gitconfig >/dev/null 2>/dev/null; then
-	echo -e '\nInitializing git LFS...'
-	git lfs install --skip-repo
+if ! dpkg -s git-flow >/dev/null 2>/dev/null; then
+	echo -e '\nInstalling git...'
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy git git-lfs git-flow
+	if ! grep -q lfs ~/.gitconfig >/dev/null 2>/dev/null; then
+		echo -e '\nInitializing git LFS...'
+		git lfs install --skip-repo
+	fi
 fi
 
 if [ -x /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh ]; then
@@ -138,29 +142,36 @@ if [ -n "$DESKTOP_PACKAGES" ]; then
 fi
 
 for v in $JAVAVER; do
-	echo -e "\nInstalling Java $v..."
 	javaPkg=openjdk-$v-jdk
 	if [ -z "$DESKTOP_PACKAGES" ]; then
 		javaPkg="${javaPkg}-headless"
 	fi
-	sudo DEBIAN_FRONTEND=noninteractive apt install -qy $javaPkg
+	if ! dpkg -s $javaPkg >/dev/null 2>/dev/null; then
+		echo -e "\nInstalling Java $v..."
+		sudo DEBIAN_FRONTEND=noninteractive apt install -qy $javaPkg
+	fi
 done
   
-echo -e "\nInstalling supporting utilities..."
-sudo DEBIAN_FRONTEND=noninteractive apt install -qy gnupg apt-transport-https lsb-release wget \
-  git git-flow
+if ! dpkg -s git-flow >/dev/null 2>/dev/null; then
+	echo -e "\nInstalling supporting utilities..."
+	sudo DEBIAN_FRONTEND=noninteractive apt install -qy gnupg apt-transport-https lsb-release wget
+fi
   
-echo -e "\nInstalling Postgres $PGVER..."
-sudo DEBIAN_FRONTEND=noninteractive apt install -qy postgresql-$PGVER postgresql-contrib-$PGVER \
-  postgresql-common
+if ! dpkg -s postgresql-$PGVER >/dev/null 2>/dev/null; then
+	echo -e "\nInstalling Postgres $PGVER..."
+	sudo DEBIAN_FRONTEND=noninteractive apt install -qy postgresql-$PGVER postgresql-contrib-$PGVER \
+	  postgresql-common
+fi
 
-echo -e '\nInstalling Postgres extensions...'
-sudo apt install -qy timescaledb-2-postgresql-$PGVER postgresql-$PGVER-aggs-for-vecs
+if ! dpkg -s timescaledb-2-postgresql-$PGVER >/dev/null 2>/dev/null; then
+	echo -e '\nInstalling Postgres extensions...'
+	sudo apt install -qy timescaledb-2-postgresql-$PGVER postgresql-$PGVER-aggs-for-vecs
+fi
 
 echo -e '\nCleaning up unused packages...'
 sudo apt autoremove -qy
 
-if ! grep -q 'jit = on' /etc/postgresql/$PGVER/main/postgresql.conf 2>/dev/null; then
+if ! grep -q 'jit = on' /etc/postgresql/$PGVER/main/postgresql.conf >/dev/null 2>/dev/null; then
 	echo -e '\nDisabling JIT in Postgres...'
 	sudo sed -i -e 's/^#*jit = .*/jit = off/' /etc/postgresql/$PGVER/main/postgresql.conf
 	sudo service postgresql restart
@@ -236,6 +247,91 @@ if [ ! -e /etc/sudoers.d/solardev -a -e /vagrant/solardev.sudoers ]; then
 	echo -e '\nCreating sudoers file for solardev user...'
 	sudo cp /vagrant/solardev.sudoers /etc/sudoers.d/solardev
 	sudo chmod 644 /etc/sudoers.d/solardev
+fi
+
+# Install VerneMQ
+if dpkg -s vernemq >/dev/null 2>/dev/null; then
+	echo -e "\nVerneMQ package already installed."
+else
+	vernemqVersion="1.12.6.2"
+	vernemqFilename="vernemq-${vernemqVersion}.jammy.x86_64.deb"
+	vernemqDownload="/var/tmp/${vernemqFilename}"
+	vernemqDownloadUrl="https://github.com/vernemq/vernemq/releases/download/${vernemqVersion}/${vernemqFilename}"
+	vernemqDownloadSha256="6ea7d50177d27fb9f69d8fc3e9c0e08d4a95308f1ead932721d187bea979bad5"
+	vernemqDownloadHash=""
+
+	vernemqHashFile () {
+		echo -e '\nVerifying VerneMQ download...'
+		vernemqDownloadHash=`sha256sum $vernemqDownload |cut -d' ' -f1`
+	}
+
+	if [ -e "$vernemqDownload" ]; then
+		vernemqHashFile
+	fi
+
+	if [ "$vernemqDownloadHash" != "$vernemqDownloadSha256" ]; then
+		echo -e "\nDownloading VernemMQ ($vernemqVersion)..."
+		curl -C - -L -s -S -o "$vernemqDownload" "$vernemqDownloadUrl"
+		if [ -e "$vernemqDownload" ]; then
+			vernemqHashFile
+		fi
+	fi
+	if [ -e "$vernemqDownload" ]; then
+		if [ "$vernemqDownloadHash" = "$vernemqDownloadSha256" ]; then
+			echo -e "\nInstalling VerneMQ ($vernemqVersion)..."
+			sudo apt-get -qy install "$vernemqDownload"
+			if [ $? -eq 0 ]; then
+				rm "$vernemqDownload"
+			fi
+		else
+			>&2 echo "Eclipse $vernemqVersion not completely downloaded, cannot install."
+		fi
+	fi
+fi
+
+# Make tweaks to VerneMQ default configuration
+if ! grep -q node /etc/vernemq/vmq.acl 2>/dev/null; then
+	echo -e '\nConfiguring Vernemq ACL...'
+	sudo cp /vagrant/conf/solarqueue/vmq.acl /etc/vernemq/vmq.acl
+fi
+if ! grep -q solarnet /etc/vernemq/vmq.passwd 2>/dev/null; then
+	echo -e '\nConfiguring Vernemq credentials...'
+	sudo cp /vagrant/conf/solarqueue/vmq.passwd /etc/vernemq/vmq.passwd
+	sudo vmq-passwd -U /etc/vernemq/vmq.passwd
+fi
+if [ ! -e /etc/vernemq/vernemq.conf.orig ]; then
+	echo -e '\nCreating backup of VerneMQ configuration...'
+	sudo cp -a /etc/vernemq/vernemq.conf /etc/vernemq/vernemq.conf.orig
+fi
+if grep -q 'accept_eula = no' /etc/vernemq/vernemq.conf; then
+	sudo sed -i 's/accept_eula = no/accept_eula = yes/' /etc/vernemq/vernemq.conf
+fi
+if grep -q '^allow_anonymous = off' /etc/vernemq/vernemq.conf; then
+	sudo sed -i 's/^allow_anonymous = off/allow_anonymous = on/' /etc/vernemq/vernemq.conf
+fi
+if grep -q '^listener.tcp.name' /etc/vernemq/vernemq.conf; then
+	sudo sed -i 's/^listener.tcp.name/#listener.tcp.name/' /etc/vernemq/vernemq.conf
+fi
+if grep -q '^listener.ssl.name' /etc/vernemq/vernemq.conf; then
+	sudo sed -i 's/^listener.ssl.name/#listener.ssl.name/' /etc/vernemq/vernemq.conf
+fi
+if [ ! -e /etc/vernemq/conf.d/solarnet.conf ]; then
+	echo -e '\nCreating SolarNet VerneMQ configuration...'
+	if [ ! -d /etc/vernemq/conf.d ]; then
+		sudo mkdir -p /etc/vernemq/conf.d
+	fi
+	sudo cp /vagrant/conf/solarqueue/solarnet.conf /etc/vernemq/conf.d/
+fi
+
+# Enable VerneMQ service
+sudo systemctl enable vernemq
+
+# Install Mosquitto client
+if dpkg -s mosquitto-clients >/dev/null 2>/dev/null; then
+	echo -e '\nMosquitto MQTT client already installed.'
+else
+	echo -e '\nInstalling Mosquitto MQTT client...'
+	sudo apt-get -qy install mosquitto-clients
 fi
 
 # Check out the source code
