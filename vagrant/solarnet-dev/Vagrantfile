@@ -20,7 +20,7 @@ java_version="8 11 17"
 solarnet_host="solarnetworkdev.net"
 
 # Note xserver-xorg-legacy was only way I could find to get X to start as solardev on login from console
-desktop_packages="xorg xserver-xorg-legacy xserver-xorg-video-vesa xserver-xorg-video-vmware xfonts-scalable fluxbox eterm xfonts-terminus virtualbox-guest-utils virtualbox-guest-x11 pgadmin4-desktop xterm --no-install-recommends"
+desktop_packages="xorg xserver-xorg-legacy xserver-xorg-video-vesa xserver-xorg-video-vmware xfonts-scalable fluxbox eterm xfonts-terminus virtualbox-guest-utils virtualbox-guest-x11 xterm --no-install-recommends"
 
 # Read any user specific configuration overrides - cater for this file not existing
 local_env_config_file="Vagrantfile.local"

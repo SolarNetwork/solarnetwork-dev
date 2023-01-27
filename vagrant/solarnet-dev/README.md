@@ -48,8 +48,8 @@ These can be overridden using by creating a file named `Vagrantfile.local` along
 The default `desktop_packages` value is:
 
  * xorg xserver-xorg-legacy xserver-xorg-video-vesa xserver-xorg-video-vmware xfonts-scalable 
-   fluxbox eterm xfonts-terminus virtualbox-guest-utils virtualbox-guest-x11 pgadmin4-desktop
-   xterm --no-install-recommends
+   fluxbox eterm xfonts-terminus virtualbox-guest-utils virtualbox-guest-x11 xterm
+   --no-install-recommends
 
 Examples for the desktop_packages variable include:
 
