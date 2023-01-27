@@ -313,7 +313,7 @@ if [ ! -e /etc/vernemq/conf.d/solarnet.conf ]; then
 fi
 
 # Enable VerneMQ service
-systemctl enable vernemq
+sudo systemctl enable vernemq
 
 # Install Mosquitto client
 if dpkg -s mosquitto-clients 2>/dev/null; then
