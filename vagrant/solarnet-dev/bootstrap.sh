@@ -312,6 +312,9 @@ if [ ! -e /etc/vernemq/conf.d/solarnet.conf ]; then
 	sudo cp /vagrant/conf/solarqueue/solarnet.conf /etc/vernemq/conf.d/
 fi
 
+# Enable VerneMQ service
+systemctl enable vernemq
+
 # Install Mosquitto client
 if dpkg -s mosquitto-clients 2>/dev/null; then
 	echo -e '\nMosquitto MQTT client already installed.'
