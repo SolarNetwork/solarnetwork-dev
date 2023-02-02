@@ -387,6 +387,15 @@ if [ -d /vagrant/conf/solarnetwork-central/solarnet -a -d "$GIT_HOME/solarnetwor
 	sudo -i -u solardev cp -anv /vagrant/conf/solarnetwork-central/solarnet "$GIT_HOME/solarnetwork-central/"
 fi
 
+# copy Firefox conf files; skipping any that already exist
+if [ ! -e /home/solardev/snap/firefox/common/.mozilla/firefox/profiles.ini ]; then
+	echo -e '\nCreating initial Firefox configuration...'
+	if [ ! -d /home/solardev/snap/firefox/common/.mozilla/firefox ]; then
+		sudo -i -u solardev mkdir -p /home/solardev/snap/firefox/common/.mozilla/firefox
+	fi
+	sudo -i -u solardev cp -anv /vagrant/conf/firefox "/home/solardev/snap/firefox/common/.mozilla/"
+fi
+
 # Success messages
 if [ -x /usr/bin/fluxbox ]; then
 	cat <<"EOF"
