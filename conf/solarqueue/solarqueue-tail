@@ -1,0 +1,19 @@
+#!/bin/sh
+
+if [ -z "$1" ]; then
+	echo "Pass MQTT topic to subscribe to, for example node/#"
+	exit 1
+fi
+
+mosquitto_sub -V mqttv31 \
+	-h localhost -p 1883 \
+	-q 0 \
+	-i 'solardev_mos' \
+	-u 'admin' \
+	-P 'admin' \
+	-F '%t %x' \
+	-t "$1" | (
+	while read -r LINE; do
+		echo "$(date)" $(echo "$LINE" |cut -d' ' -f1) $(echo "$LINE" |cut -d' ' -f2 |xxd -r -p |cbor2json.rb)
+  	done;
+)

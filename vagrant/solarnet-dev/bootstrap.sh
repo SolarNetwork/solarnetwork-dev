@@ -339,6 +339,12 @@ else
 	sudo apt-get -qy install mosquitto-clients
 fi
 
+if [ ! -x /usr/local/bin/solarqueue-tail ]; then
+	echo -e '\nInstalling solarqueue-tail tool...'
+	sudo cp /vagrant/conf/solarqueue/solarqueue-tail /usr/local/bin/solarqueue-tail
+	sudo chmod 755 /usr/local/bin/solarqueue-tail
+fi
+
 # Check out the source code
 if [ -x /vagrant/bin/solardev-git.sh ]; then
 	sudo -i -u solardev /vagrant/bin/solardev-git.sh -g "$GIT_HOME" -b "$GIT_BRANCH" -r "$GIT_REPOS"
