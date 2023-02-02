@@ -132,7 +132,7 @@ if [ ! -e /etc/apt/sources.list.d/pgdg.list ]; then
 fi
 
 if [ -n $doAptUpdate ]; then
-	sudo apt update
+	sudo apt-get update
 fi
 
 # Install desktop stuff
@@ -153,24 +153,24 @@ for v in $JAVAVER; do
 	fi
 	if ! dpkg -s $javaPkg >/dev/null 2>/dev/null; then
 		echo -e "\nInstalling Java $v..."
-		sudo DEBIAN_FRONTEND=noninteractive apt install -qy $javaPkg
+		sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy $javaPkg
 	fi
 done
   
 if ! dpkg -s git-flow >/dev/null 2>/dev/null; then
 	echo -e "\nInstalling supporting utilities..."
-	sudo DEBIAN_FRONTEND=noninteractive apt install -qy gnupg apt-transport-https lsb-release wget
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy gnupg apt-transport-https lsb-release wget
 fi
   
 if ! dpkg -s postgresql-$PGVER >/dev/null 2>/dev/null; then
 	echo -e "\nInstalling Postgres $PGVER..."
-	sudo DEBIAN_FRONTEND=noninteractive apt install -qy postgresql-$PGVER postgresql-contrib-$PGVER \
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy postgresql-$PGVER postgresql-contrib-$PGVER \
 	  postgresql-common
 fi
 
 if ! dpkg -s timescaledb-2-postgresql-$PGVER >/dev/null 2>/dev/null; then
 	echo -e '\nInstalling Postgres extensions...'
-	sudo apt install -qy timescaledb-2-postgresql-$PGVER postgresql-$PGVER-aggs-for-vecs
+	sudo apt-get install -qy timescaledb-2-postgresql-$PGVER postgresql-$PGVER-aggs-for-vecs
 fi
 
 echo -e '\nCleaning up unused packages...'
