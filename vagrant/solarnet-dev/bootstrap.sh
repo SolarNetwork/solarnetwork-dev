@@ -381,7 +381,7 @@ if [ -x /vagrant/bin/solardev-workspace.sh -a -x /usr/bin/X ]; then
 	sudo -i -u solardev /vagrant/bin/solardev-workspace.sh -w "$WORKSPACE" -g "$GIT_HOME"
 fi
 
-# copy conf files; skipping any that already exist
+# copy SolarNet conf files; skipping any that already exist
 if [ -d /vagrant/conf/solarnetwork-central/solarnet -a -d "$GIT_HOME/solarnetwork-central/solarnet" ]; then
 	echo -e '\nCreating initial SolarNet configuration...'
 	sudo -i -u solardev cp -anv /vagrant/conf/solarnetwork-central/solarnet "$GIT_HOME/solarnetwork-central/"
