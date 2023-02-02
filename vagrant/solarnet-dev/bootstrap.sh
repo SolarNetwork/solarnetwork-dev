@@ -173,10 +173,10 @@ if ! dpkg -s timescaledb-2-postgresql-$PGVER >/dev/null 2>/dev/null; then
 	sudo apt-get install -qy timescaledb-2-postgresql-$PGVER postgresql-$PGVER-aggs-for-vecs
 fi
 
-if ! grep -q 'jit = on' /etc/postgresql/$PGVER/main/postgresql.conf >/dev/null 2>/dev/null; then
-	echo -e '\nDisabling JIT in Postgres...'
-	sudo sed -i -e 's/^#*jit = .*/jit = off/' /etc/postgresql/$PGVER/main/postgresql.conf
-	sudo service postgresql restart
+if ! dpkg -s ruby >/dev/null 2>/dev/null; then
+	echo -e '\nInstalling Ruby and cbor-diag gem...'
+	sudo apt-get install -qy ruby
+	sudo gem install cbor-diag
 fi
 
 echo -e '\nCleaning up unused packages...'
@@ -196,20 +196,37 @@ if ! getent passwd solardev >/dev/null; then
 	sudo sh -c 'echo "solardev:solardev" |chpasswd'
 fi
 
+restartPostgres=""
+
+if ! grep -q 'jit = on' /etc/postgresql/$PGVER/main/postgresql.conf >/dev/null 2>/dev/null; then
+	echo -e '\nDisabling JIT in Postgres...'
+	sudo sed -i -e 's/^#*jit = .*/jit = off/' /etc/postgresql/$PGVER/main/postgresql.conf
+	restartPostgres=1
+fi
+
+if grep -q "listen_addresses = '\*'" /etc/postgresql/$PGVER/main/postgresql.conf >/dev/null; then
+	echo "listen_address already configured in postgresql.conf."
+else
+	echo "Configuring listen_address in postgresql.conf"
+	sudo sed -Ei -e 's/#?listen_addresses = '"'.*'"'/listen_addresses = '"'*'"'/' \
+		/etc/postgresql/$PGVER/main/postgresql.conf
+	restartPostgres=1
+fi
+
 if grep -q "shared_preload_libraries.*$PG_PRELOAD_LIB" /etc/postgresql/$PGVER/main/postgresql.conf >/dev/null; then
 	echo "shared_preload_libraries already configured in postgresql.conf."
 else
 	echo "Configuring shared_preload_libraries in postgresql.conf"
 	sudo sed -Ei -e 's/#?shared_preload_libraries = '"'.*'"'/shared_preload_libraries = '"'$PG_PRELOAD_LIB'/" \
 		/etc/postgresql/$PGVER/main/postgresql.conf
-	sudo service postgresql restart
+	restartPostgres=1
 fi
 
 if ! sudo grep -q solarnet /etc/postgresql/$PGVER/main/pg_ident.conf 2>/dev/null; then
 	echo -e '\nConfiguring Postgres solardev user mapping...'
 	sudo sh -c "echo \"solarnet solardev solarnet\" >> /etc/postgresql/$PGVER/main/pg_ident.conf"
 	sudo sh -c "echo \"solartest solardev solartest\" >> /etc/postgresql/$PGVER/main/pg_ident.conf"
-	sudo service postgresql restart
+	restartPostgres=1
 fi
 
 if [ -e /vagrant/pg_hba.sed ]; then
@@ -220,8 +237,12 @@ if [ -e /vagrant/pg_hba.sed ]; then
 		sudo chmod 640 /etc/postgresql/$PGVER/main/pg_hba.conf.new
 		sudo mv /etc/postgresql/$PGVER/main/pg_hba.conf /etc/postgresql/$PGVER/main/pg_hba.conf.bak
 		sudo mv /etc/postgresql/$PGVER/main/pg_hba.conf.new /etc/postgresql/$PGVER/main/pg_hba.conf
-		sudo service postgresql restart
+		restartPostgres=1
 	fi
+fi
+
+if [ -n "restartPostgres" ]; then
+	sudo service postgresql restart
 fi
 
 if ! sudo -u postgres sh -c "psql -d solarnetwork -c 'SELECT now()'" >/dev/null 2>&1; then
