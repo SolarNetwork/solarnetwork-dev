@@ -173,14 +173,14 @@ if ! dpkg -s timescaledb-2-postgresql-$PGVER >/dev/null 2>/dev/null; then
 	sudo apt-get install -qy timescaledb-2-postgresql-$PGVER postgresql-$PGVER-aggs-for-vecs
 fi
 
-echo -e '\nCleaning up unused packages...'
-sudo apt autoremove -qy
-
 if ! grep -q 'jit = on' /etc/postgresql/$PGVER/main/postgresql.conf >/dev/null 2>/dev/null; then
 	echo -e '\nDisabling JIT in Postgres...'
 	sudo sed -i -e 's/^#*jit = .*/jit = off/' /etc/postgresql/$PGVER/main/postgresql.conf
 	sudo service postgresql restart
 fi
+
+echo -e '\nCleaning up unused packages...'
+sudo apt-get autoremove -qy --purge
 
 if [ -n "$DESKTOP_PACKAGES" ]; then
 	echo -e '\nInstalling web browsers...'
