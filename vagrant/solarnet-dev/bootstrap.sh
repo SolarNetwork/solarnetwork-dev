@@ -132,18 +132,18 @@ if [ ! -e /etc/apt/sources.list.d/pgdg.list ]; then
 fi
 
 if [ -n $doAptUpdate ]; then
-	sudo apt update
+	sudo apt-get update
 fi
 
 # Install desktop stuff
 if [ -n "$DESKTOP_PACKAGES" ]; then
+	echo -e "\nInstalling Desktop Packages: $DESKTOP_PACKAGES"
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy $DESKTOP_PACKAGES
+
 	if ! dpkg -s pgadmin4-desktop >/dev/null 2>/dev/null; then
 		echo -e "\nInstalling pgAdmin..."
 		sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy pgadmin4-desktop
 	fi
-	
-	echo -e "\nInstalling Desktop Packages: $DESKTOP_PACKAGES"
-	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy $DESKTOP_PACKAGES
 fi
 
 for v in $JAVAVER; do
@@ -153,34 +153,34 @@ for v in $JAVAVER; do
 	fi
 	if ! dpkg -s $javaPkg >/dev/null 2>/dev/null; then
 		echo -e "\nInstalling Java $v..."
-		sudo DEBIAN_FRONTEND=noninteractive apt install -qy $javaPkg
+		sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy $javaPkg
 	fi
 done
   
 if ! dpkg -s git-flow >/dev/null 2>/dev/null; then
 	echo -e "\nInstalling supporting utilities..."
-	sudo DEBIAN_FRONTEND=noninteractive apt install -qy gnupg apt-transport-https lsb-release wget
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy gnupg apt-transport-https lsb-release wget
 fi
   
 if ! dpkg -s postgresql-$PGVER >/dev/null 2>/dev/null; then
 	echo -e "\nInstalling Postgres $PGVER..."
-	sudo DEBIAN_FRONTEND=noninteractive apt install -qy postgresql-$PGVER postgresql-contrib-$PGVER \
+	sudo DEBIAN_FRONTEND=noninteractive apt-get install -qy postgresql-$PGVER postgresql-contrib-$PGVER \
 	  postgresql-common
 fi
 
 if ! dpkg -s timescaledb-2-postgresql-$PGVER >/dev/null 2>/dev/null; then
 	echo -e '\nInstalling Postgres extensions...'
-	sudo apt install -qy timescaledb-2-postgresql-$PGVER postgresql-$PGVER-aggs-for-vecs
+	sudo apt-get install -qy timescaledb-2-postgresql-$PGVER postgresql-$PGVER-aggs-for-vecs
+fi
+
+if ! dpkg -s ruby >/dev/null 2>/dev/null; then
+	echo -e '\nInstalling Ruby and cbor-diag gem...'
+	sudo apt-get install -qy ruby
+	sudo gem install cbor-diag
 fi
 
 echo -e '\nCleaning up unused packages...'
-sudo apt autoremove -qy
-
-if ! grep -q 'jit = on' /etc/postgresql/$PGVER/main/postgresql.conf >/dev/null 2>/dev/null; then
-	echo -e '\nDisabling JIT in Postgres...'
-	sudo sed -i -e 's/^#*jit = .*/jit = off/' /etc/postgresql/$PGVER/main/postgresql.conf
-	sudo service postgresql restart
-fi
+sudo apt-get autoremove -qy --purge
 
 if [ -n "$DESKTOP_PACKAGES" ]; then
 	echo -e '\nInstalling web browsers...'
@@ -196,20 +196,37 @@ if ! getent passwd solardev >/dev/null; then
 	sudo sh -c 'echo "solardev:solardev" |chpasswd'
 fi
 
+restartPostgres=""
+
+if ! grep -q 'jit = on' /etc/postgresql/$PGVER/main/postgresql.conf >/dev/null 2>/dev/null; then
+	echo -e '\nDisabling JIT in Postgres...'
+	sudo sed -i -e 's/^#*jit = .*/jit = off/' /etc/postgresql/$PGVER/main/postgresql.conf
+	restartPostgres=1
+fi
+
+if grep -q "listen_addresses = '\*'" /etc/postgresql/$PGVER/main/postgresql.conf >/dev/null; then
+	echo "listen_address already configured in postgresql.conf."
+else
+	echo "Configuring listen_address in postgresql.conf"
+	sudo sed -Ei -e 's/#?listen_addresses = '"'.*'"'/listen_addresses = '"'*'"'/' \
+		/etc/postgresql/$PGVER/main/postgresql.conf
+	restartPostgres=1
+fi
+
 if grep -q "shared_preload_libraries.*$PG_PRELOAD_LIB" /etc/postgresql/$PGVER/main/postgresql.conf >/dev/null; then
 	echo "shared_preload_libraries already configured in postgresql.conf."
 else
 	echo "Configuring shared_preload_libraries in postgresql.conf"
 	sudo sed -Ei -e 's/#?shared_preload_libraries = '"'.*'"'/shared_preload_libraries = '"'$PG_PRELOAD_LIB'/" \
 		/etc/postgresql/$PGVER/main/postgresql.conf
-	sudo service postgresql restart
+	restartPostgres=1
 fi
 
 if ! sudo grep -q solarnet /etc/postgresql/$PGVER/main/pg_ident.conf 2>/dev/null; then
 	echo -e '\nConfiguring Postgres solardev user mapping...'
 	sudo sh -c "echo \"solarnet solardev solarnet\" >> /etc/postgresql/$PGVER/main/pg_ident.conf"
 	sudo sh -c "echo \"solartest solardev solartest\" >> /etc/postgresql/$PGVER/main/pg_ident.conf"
-	sudo service postgresql restart
+	restartPostgres=1
 fi
 
 if [ -e /vagrant/pg_hba.sed ]; then
@@ -220,8 +237,12 @@ if [ -e /vagrant/pg_hba.sed ]; then
 		sudo chmod 640 /etc/postgresql/$PGVER/main/pg_hba.conf.new
 		sudo mv /etc/postgresql/$PGVER/main/pg_hba.conf /etc/postgresql/$PGVER/main/pg_hba.conf.bak
 		sudo mv /etc/postgresql/$PGVER/main/pg_hba.conf.new /etc/postgresql/$PGVER/main/pg_hba.conf
-		sudo service postgresql restart
+		restartPostgres=1
 	fi
+fi
+
+if [ -n "restartPostgres" ]; then
+	sudo service postgresql restart
 fi
 
 if ! sudo -u postgres sh -c "psql -d solarnetwork -c 'SELECT now()'" >/dev/null 2>&1; then
@@ -339,6 +360,12 @@ else
 	sudo apt-get -qy install mosquitto-clients
 fi
 
+if [ ! -x /usr/local/bin/solarqueue-tail ]; then
+	echo -e '\nInstalling solarqueue-tail tool...'
+	sudo cp /vagrant/conf/solarqueue/solarqueue-tail /usr/local/bin/solarqueue-tail
+	sudo chmod 755 /usr/local/bin/solarqueue-tail
+fi
+
 # Check out the source code
 if [ -x /vagrant/bin/solardev-git.sh ]; then
 	sudo -i -u solardev /vagrant/bin/solardev-git.sh -g "$GIT_HOME" -b "$GIT_BRANCH" -r "$GIT_REPOS"
@@ -354,10 +381,19 @@ if [ -x /vagrant/bin/solardev-workspace.sh -a -x /usr/bin/X ]; then
 	sudo -i -u solardev /vagrant/bin/solardev-workspace.sh -w "$WORKSPACE" -g "$GIT_HOME"
 fi
 
-# copy conf files; skipping any that already exist
+# copy SolarNet conf files; skipping any that already exist
 if [ -d /vagrant/conf/solarnetwork-central/solarnet -a -d "$GIT_HOME/solarnetwork-central/solarnet" ]; then
 	echo -e '\nCreating initial SolarNet configuration...'
 	sudo -i -u solardev cp -anv /vagrant/conf/solarnetwork-central/solarnet "$GIT_HOME/solarnetwork-central/"
+fi
+
+# copy Firefox conf files; skipping any that already exist
+if [ ! -e /home/solardev/snap/firefox/common/.mozilla/firefox/profiles.ini ]; then
+	echo -e '\nCreating initial Firefox configuration...'
+	if [ ! -d /home/solardev/snap/firefox/common/.mozilla/firefox ]; then
+		sudo -i -u solardev mkdir -p /home/solardev/snap/firefox/common/.mozilla/firefox
+	fi
+	sudo -i -u solardev cp -anv /vagrant/conf/firefox "/home/solardev/snap/firefox/common/.mozilla/"
 fi
 
 # Success messages
