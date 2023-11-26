@@ -86,7 +86,7 @@ if [ -x /usr/bin/X -a ! -x ~/eclipse/eclipse ]; then
 	if [ ! -d ~/eclipse -a -e "$eclipseDownload" ]; then
 		if [ "$eclipseDownloadHash" = "$eclipseDownloadSHA512" ]; then
 			echo -e "\nInstalling Eclipse JEE ($eclipseName)..."
-			tar -C ~/ -xzf "$eclipseDownload"
+			tar -C ~/ -xzf "$eclipseDownload" 2>/dev/null
 			if [ $? -eq 0 ]; then
 				rm $eclipseDownload
 			fi
