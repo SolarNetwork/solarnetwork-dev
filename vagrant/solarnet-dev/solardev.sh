@@ -62,9 +62,9 @@ fi
 
 if [ -x /usr/bin/X -a ! -x ~/eclipse/eclipse ]; then
 	eclipseDownload=/var/tmp/eclipse.tgz
-	eclipseName=2022-12
-	eclipseDownloadURL='https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/2022-12/R/eclipse-jee-2022-12-R-linux-gtk-x86_64.tar.gz&r=1'
-	eclipseDownloadSHA512=e798bd61539afaf287b7bdaf1c8ab2f4198a32483529a2ea312b634ed7da2d31f9c8fd1e8be3533f65cbf080473a0bb4842109a985d3abedc8dd1432e3be9eb5
+	eclipseName=2023-09
+	eclipseDownloadURL='https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/2023-09/R/eclipse-jee-2023-09-R-linux-gtk-x86_64.tar.gz&r=1'
+	eclipseDownloadSHA512=46d02838283b2f84b26b5d2a39c223f14c88a9cae1e22a77666db78664dc292dc3482e3f68fd4fa77fcdc9f18b40e52c366d57aad1929ac03a26684842a565bc
 	eclipseDownloadHash=
 
 	eclipseHashFile () {
