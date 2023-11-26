@@ -112,6 +112,18 @@ elif [ -e "$SCRIPT_HOME/bin/add-tostring-template.awk" ]; then
   fi
 fi
 
+# Configure XML Catalog
+if [ ! -e "$WORKSPACE/.metadata/.plugins/org.eclipse.wst.xml.core/user_catalog.xml" ]; then
+  echo -e '\nCreating Eclipse XML Catalog configuration...'
+  if [ ! -d "$WORKSPACE/.metadata/.plugins/org.eclipse.wst.xml.core" ]; then
+    mkdir -p "$WORKSPACE/.metadata/.plugins/org.eclipse.wst.xml.core"
+  fi
+  cp "$SCRIPT_HOME/eclipse/org.eclipse.wst.xml.core/user_catalog.xml" "$WORKSPACE/.metadata/.plugins/org.eclipse.wst.xml.core/user_catalog.xml"
+  if [ ! -e "$WORKSPACE/.metadata/.plugins/org.eclipse.wst.xml.core/default_catalog.xml" ]; then
+    cp "$SCRIPT_HOME/eclipse/org.eclipse.wst.xml.core/default_catalog.xml" "$WORKSPACE/.metadata/.plugins/org.eclipse.wst.xml.core/default_catalog.xml"
+  fi
+fi
+
 # Install SolarNetwork code templates and formatting rules
 setProperty () {
   # expects: property name, value, file path
