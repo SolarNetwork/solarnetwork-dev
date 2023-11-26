@@ -70,7 +70,7 @@ if [ ! -e "$WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches/SolarN
     mkdir -p "$WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches"
   fi
   # turn project dir list of *.test projects into comma-delimited list of names
-  excludeProjectNames=$(find $GIT_HOME/*/* -type d -prune -name '*.test' -print |awk -F/ '{print $NF}' |tr '\n' ',')
+  excludeProjectNames=$(find $GIT_HOME/*/* -type d -prune \( -name '*.test' -o -name '*.tests' \)  -print |awk -F/ '{print $NF}' |tr '\n' ',')
   # have to treat the "external" projects differently, because folder names do not include ".external" part of project name
   excludeExternalProjectNames=$(find $GIT_HOME/solarnetwork-external/* -type d -prune -name '*.test' -print \
   	|awk -F/ '{gsub("net.solarnetwork","net.solarnetwork.external",$NF); print $NF}' |tr '\n' ',' |sed 's/,$//')
