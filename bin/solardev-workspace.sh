@@ -58,7 +58,7 @@ if [ ! -e "$WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.
   echo -e '\nConfiguring SolarNetwork Eclipse PDE target platform...'
   cat > "$WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.pde.core.prefs" <<EOF
 eclipse.preferences.version=1
-workspace_target_handle=resource\:/solarnetwork-osgi-target/defs/solarnode-gemini.target
+workspace_target_handle=resource\:/solarnetwork-osgi-target/defs/solarnode-pax.target
 EOF
 fi
 
@@ -192,10 +192,13 @@ skipProjects=("solarnetwork-build/archiva-obr-plugin" \
   "solarnetwork-common/net.solarnetwork.pidfile" \
   "solarnetwork-external/aws-s3-osgi" \
   "solarnetwork-external/net.solarnetwork.external.opendnp3-bindings" \
+  "solarnetwork-external/net.solarnetwork.org.apache.catalina" \
   "solarnetwork-node/net.solarnetwork.node.config" \
   "solarnetwork-node/net.solarnetwork.node.io.dnp3" \
   "solarnetwork-node/net.solarnetwork.node.io.dnp3.test" \
   "solarnetwork-node/net.solarnetwork.node.setup.developer" \
+  "solarnetwork-node/net.solarnetwork.node.setup.web.proxy" \
+  "solarnetwork-node/net.solarnetwork.node.setup.web.proxy.test" \
   "solarnetwork-node/net.solarnetwork.node.setup.wifi" \
   "solarnetwork-node/net.solarnetwork.node.setup.wifi.test" \
   "solarnetwork-node/net.solarnetwork.node.upload.mock" \
