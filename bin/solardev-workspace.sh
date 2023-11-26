@@ -58,7 +58,7 @@ if [ ! -e "$WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.
   echo -e '\nConfiguring SolarNetwork Eclipse PDE target platform...'
   cat > "$WORKSPACE/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.pde.core.prefs" <<EOF
 eclipse.preferences.version=1
-workspace_target_handle=resource\:/solarnetwork-osgi-target/defs/solarnode-gemini.target
+workspace_target_handle=resource\:/solarnetwork-osgi-target/defs/solarnode-pax.target
 EOF
 fi
 
@@ -70,7 +70,7 @@ if [ ! -e "$WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches/SolarN
     mkdir -p "$WORKSPACE/.metadata/.plugins/org.eclipse.debug.core/.launches"
   fi
   # turn project dir list of *.test projects into comma-delimited list of names
-  excludeProjectNames=$(find $GIT_HOME/*/* -type d -prune -name '*.test' -print |awk -F/ '{print $NF}' |tr '\n' ',')
+  excludeProjectNames=$(find $GIT_HOME/*/* -type d -prune \( -name '*.test' -o -name '*.tests' \)  -print |awk -F/ '{print $NF}' |tr '\n' ',')
   # have to treat the "external" projects differently, because folder names do not include ".external" part of project name
   excludeExternalProjectNames=$(find $GIT_HOME/solarnetwork-external/* -type d -prune -name '*.test' -print \
   	|awk -F/ '{gsub("net.solarnetwork","net.solarnetwork.external",$NF); print $NF}' |tr '\n' ',' |sed 's/,$//')
@@ -109,6 +109,18 @@ elif [ -e "$SCRIPT_HOME/bin/add-tostring-template.awk" ]; then
     echo -e '\nCreating SolarNetwork Eclipse toString template configuration...'
     awk -f $SCRIPT_HOME/bin/add-tostring-template.awk $WORKSPACE/.metadata/.plugins/org.eclipse.jdt.ui/dialog_settings.xml >/tmp/dialog_settings.xml
     mv -f /tmp/dialog_settings.xml $WORKSPACE/.metadata/.plugins/org.eclipse.jdt.ui/dialog_settings.xml
+  fi
+fi
+
+# Configure XML Catalog
+if [ ! -e "$WORKSPACE/.metadata/.plugins/org.eclipse.wst.xml.core/user_catalog.xml" ]; then
+  echo -e '\nCreating Eclipse XML Catalog configuration...'
+  if [ ! -d "$WORKSPACE/.metadata/.plugins/org.eclipse.wst.xml.core" ]; then
+    mkdir -p "$WORKSPACE/.metadata/.plugins/org.eclipse.wst.xml.core"
+  fi
+  cp "$SCRIPT_HOME/eclipse/org.eclipse.wst.xml.core/user_catalog.xml" "$WORKSPACE/.metadata/.plugins/org.eclipse.wst.xml.core/user_catalog.xml"
+  if [ ! -e "$WORKSPACE/.metadata/.plugins/org.eclipse.wst.xml.core/default_catalog.xml" ]; then
+    cp "$SCRIPT_HOME/eclipse/org.eclipse.wst.xml.core/default_catalog.xml" "$WORKSPACE/.metadata/.plugins/org.eclipse.wst.xml.core/default_catalog.xml"
   fi
 fi
 
@@ -180,10 +192,13 @@ skipProjects=("solarnetwork-build/archiva-obr-plugin" \
   "solarnetwork-common/net.solarnetwork.pidfile" \
   "solarnetwork-external/aws-s3-osgi" \
   "solarnetwork-external/net.solarnetwork.external.opendnp3-bindings" \
+  "solarnetwork-external/net.solarnetwork.org.apache.catalina" \
   "solarnetwork-node/net.solarnetwork.node.config" \
   "solarnetwork-node/net.solarnetwork.node.io.dnp3" \
   "solarnetwork-node/net.solarnetwork.node.io.dnp3.test" \
   "solarnetwork-node/net.solarnetwork.node.setup.developer" \
+  "solarnetwork-node/net.solarnetwork.node.setup.web.proxy" \
+  "solarnetwork-node/net.solarnetwork.node.setup.web.proxy.test" \
   "solarnetwork-node/net.solarnetwork.node.setup.wifi" \
   "solarnetwork-node/net.solarnetwork.node.setup.wifi.test" \
   "solarnetwork-node/net.solarnetwork.node.upload.mock" \
